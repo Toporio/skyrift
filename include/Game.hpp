@@ -5,12 +5,7 @@
 
 class Game {
 public:
-  Game()
-      : window(sf::RenderWindow(
-            sf::VideoMode({Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT}),
-            Config::WINDOW_TITLE)) {
-    window.setFramerateLimit(Config::FPS_LIMIT);
-  };
+  Game();
   void run();
 
 private:

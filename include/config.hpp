@@ -1,5 +1,4 @@
 #pragma once
-#include "Game.hpp"
 #include <string>
 
 namespace Config {
