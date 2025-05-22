@@ -27,3 +27,7 @@ struct PlayerInputState {
   sf::Vector2f aimDirection;
   int sequence_number = 0;
 };
+struct GameSettings {
+  unsigned int player_lives = 3;
+  float player_health = 0.1f;
+};
