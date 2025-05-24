@@ -6,7 +6,8 @@ const unsigned int WINDOW_WIDTH = 1280;
 const unsigned int WINDOW_HEIGHT = 720;
 const std::string WINDOW_TITLE = "SkyRift";
 const unsigned int FPS_LIMIT = 144;
-
+const float PROJECTILE_DAMAGE = 1.0f;
+const float PROJECTILE_SPEED = 200.0f;
 const float GRAVITY = 981.0f * 2.0f;
 const float PLAYER_MOVE_SPEED = 300.0f;
 const float PLAYER_JUMP_SPEED = 500.0f;

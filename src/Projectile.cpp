@@ -1,0 +1,41 @@
+#include "Projectile.hpp"
+#include "config.hpp"
+#include "common.hpp"
+
+Projectile::Projectile(int id, float dir_x, const sf::Vector2f& position)
+    : Entity(
+        id,
+        PROJECTILE_TEXTURE,
+        position,
+        sf::Vector2f(dir_x* Config::PROJECTILE_SPEED, 0.f)
+    )
+{
+    this->hp = 1;
+    this->sprite.setPosition(position);
+}
+
+void Projectile::update(float delta_time) {
+    position += velocity * delta_time;
+    sprite.setPosition(position);
+	if (position.x < 0 || position.x > Config::WINDOW_WIDTH ||
+		position.y < 0 || position.y > Config::WINDOW_HEIGHT) {
+        hp = 0;
+	}
+	if (this->hp <= 0) {
+		// delete
+	}
+}
+
+void Projectile::draw(sf::RenderWindow& window) const {
+    window.draw(sprite);
+}
+
+EntityType Projectile::get_entity_type() const {
+    return EntityType::PROJECTILE;
+}
+
+int Projectile::get_id() const {
+    return id;
+}
+
+
