@@ -33,7 +33,7 @@ public:
   void jump();
   void apply_gravity(float delta_time);
   // player attacks
-  void attack_melee();
+  void attack_melee(Player& enemy, float dir_x);
   void attack_ranged(std::vector<Projectile> &projectiles,
                      sf::Vector2f &direction);
   void block(bool start_blocking);

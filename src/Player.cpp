@@ -23,7 +23,14 @@ void attack_ranged(std::vector<Projectile> &projectiles,
   // projectiles.push_back());
   return;
 }
-void Player::attack_melee() { return; }
+void Player::attack_melee(Player& enemy, float dir_x) {
+    this->sprite.move(sf::Vector2f ((dir_x > 0 ? 10.f : -10.f), 0.f));
+    if (this->check_collision(enemy)) {
+        enemy.health--;
+    }
+    this->sprite.move(sf::Vector2f((dir_x > 0 ? -10.f : 10.f), 0.f));
+}
+
 
 void Player::handle_input(const PlayerInputState &input_state,
                           float delta_time) {
