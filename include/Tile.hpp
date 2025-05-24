@@ -13,6 +13,4 @@ public:
   void draw(sf::RenderWindow &window) const override;
 
   EntityType get_entity_type() const override;
-
-  bool check_collision(const Entity &other) const override;
 };

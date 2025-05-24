@@ -10,10 +10,3 @@ Tile::Tile(int id, const sf::Texture &texture, const sf::Vector2f &position,
 void Tile::draw(sf::RenderWindow &window) const { window.draw(sprite); }
 
 EntityType Tile::get_entity_type() const { return EntityType::TILE; }
-
-bool Tile::check_collision(const Entity &other) const {
-  sf::FloatRect thisBounds = sprite.getGlobalBounds();
-  sf::FloatRect otherBounds = other.sprite.getGlobalBounds();
-  return true;
-  // return thisBojaskunds.intersects(otherBounds);
-}
