@@ -2,6 +2,7 @@
 #include "Entity.hpp"
 #include "common.hpp"
 #include "config.hpp"
+#include "Projectile.hpp"
 
 class Projectile;
 
@@ -16,6 +17,7 @@ public:
   Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
          const sf::Vector2f &velocity, unsigned int lives);
   int lives;
+  int dir_x;
   PlayerStatus status;
   float health;
 
@@ -34,8 +36,7 @@ public:
   void apply_gravity(float delta_time);
   // player attacks
   void attack_melee(Player& enemy, float dir_x);
-  void attack_ranged(std::vector<Projectile> &projectiles,
-                     sf::Vector2f &direction);
+  Projectile attack_ranged();
   void block(bool start_blocking);
   // player interactions
   void take_damage(float damage);
