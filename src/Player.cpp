@@ -20,8 +20,10 @@ void Player::move(float direction) {
 void Player::block(bool start_blocking) { return; }
 void attack_ranged(std::vector<Projectile> &projectiles,
                    sf::Vector2f &direction) {
-  projectiles.push_back(Projectile(direction));
+  // projectiles.push_back());
+  return;
 }
+void Player::attack_melee() { return; }
 
 void Player::handle_input(const PlayerInputState &input_state,
                           float delta_time) {
@@ -37,8 +39,8 @@ void Player::handle_input(const PlayerInputState &input_state,
     attack_melee();
   }
   if (input_state.attack_ranged) {
-    attack_ranged(std::vector<Projectile> & projectiles,
-                  sf::Vector2f & direction);
+    // attack_ranged(std::vector<Projectile> & projectiles,
+    //             sf::Vector2f & direction);
   }
   if (input_state.jump) {
     jump();

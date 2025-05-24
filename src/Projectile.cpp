@@ -16,9 +16,9 @@ void Projectile::update(float delta_time) {
       position.y > Config::WINDOW_HEIGHT) {
     hp = 0;
   }
-  if (this->hp <= 0) {
-    // delete
-  }
+  // if (this->hp <= 0) {
+  //  delete
+  //}
 }
 
 void Projectile::draw(sf::RenderWindow &window) const { window.draw(sprite); }

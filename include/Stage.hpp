@@ -21,7 +21,7 @@ private:
 class Stage {
 public:
   Stage(const GameSettings &settings);
-  void add_player(int player_id, const sf::Vector2f &spaw_position);
+  void add_player(int player_id, const sf::Vector2f &spawn_position);
   void remove_player(int player_id);
 
   void handle_player_input(int player_id, const PlayerInputState &input,
@@ -40,10 +40,10 @@ private:
 
   GameSettings game_settings;
   Map game_map;
-  std::map<int, Player> players;
-  std::vector<Projectile> projectiles;
+  std::map<int, std::unique_ptr<Player>> players;
+  std::vector<std::unique_ptr<Projectile>> projectiles;
   ResourceManager resource_manager;
 
   sf::FloatRect death_bounds;
   void setup_death_bounds();
-}
+};
