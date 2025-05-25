@@ -36,6 +36,7 @@ void Player::attack_melee(Player &enemy, float dir_x) {
 void Player::update(float delta_time) {
   position.x += velocity.x * delta_time;
   position.y += velocity.y * delta_time;
+  apply_gravity(delta_time);
   sprite.setPosition(position);
   std::cout << position.x, position.y;
 }
