@@ -1,9 +1,10 @@
 #include "Projectile.hpp"
 #include "common.hpp"
 #include "config.hpp"
+#include <SFML/Graphics/Texture.hpp>
 
 Projectile::Projectile(int id, float dir_x, const sf::Vector2f &position)
-    : Entity(id, PROJECTILE_TEXTURE, position,
+    : Entity(id, sf::Texture(Config::BLUE_PLAYER_SPRITES), position,
              sf::Vector2f(dir_x * Config::PROJECTILE_SPEED, 0.f)),
       hp(1) {
   this->sprite.setPosition(position);
@@ -28,3 +29,6 @@ EntityType Projectile::get_entity_type() const {
 }
 
 int Projectile::get_id() const { return id; }
+bool Projectile::check_collision(const Entity &other) const {
+  return check_collision(other);
+}

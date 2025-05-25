@@ -27,8 +27,8 @@ public:
   void handle_player_input(int player_id, const PlayerInputState &input,
                            float delta_time);
   void update(float delta_time);
-  void render(sf::RenderTarget &target);
-
+  void render(sf::RenderWindow &window);
+  void draw(sf::RenderWindow &window);
   void reset_game();
   Map &get_map() { return game_map; }
 

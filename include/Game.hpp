@@ -1,4 +1,5 @@
 #pragma once
+#include "Stage.hpp"
 #include "common.hpp"
 #include "config.hpp"
 #include <Map.hpp>
@@ -11,10 +12,9 @@ public:
 
 private:
   void handle_events();
-  void update(sf::Time delta_time);
-  void render();
+  Stage stage;
   sf::Texture rock1;
-  sf::Texture rock2;
+  PlayerInputState input_state;
   Map m_map;
   GameSettings game_settings;
   sf::RenderWindow window;

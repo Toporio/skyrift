@@ -1,8 +1,9 @@
 #pragma once
 #include "Entity.hpp"
+#include "Projectile.hpp"
 #include "common.hpp"
 #include "config.hpp"
-#include "Projectile.hpp"
+#include <SFML/Graphics.hpp>
 
 class Projectile;
 
@@ -35,7 +36,7 @@ public:
   void jump();
   void apply_gravity(float delta_time);
   // player attacks
-  void attack_melee(Player& enemy, float dir_x);
+  void attack_melee(Player &enemy, float dir_x);
   Projectile attack_ranged();
   void block(bool start_blocking);
   // player interactions
@@ -43,7 +44,7 @@ public:
   void on_block_attack();
   bool is_alive();
   void reset_player();
-
+  void draw(sf::RenderWindow &window) const override;
   // getters
   int get_player_id() const { return id; }
 };

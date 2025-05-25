@@ -1,29 +1,29 @@
 #include "Game.hpp"
 #include "Map.hpp"
+#include "Stage.hpp"
 #include "Tile.hpp"
+#include "common.hpp"
 #include "config.hpp"
+#include <SFML/Window/Keyboard.hpp>
+#include <iostream>
 
 Game::Game()
     : window(sf::RenderWindow(
           sf::VideoMode({Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT}),
           Config::WINDOW_TITLE)),
-      m_map() {
+      m_map(), stage({2, 2}) {
   window.setFramerateLimit(Config::FPS_LIMIT);
-  rock1.loadFromFile("../assets/2_Owlet_Monster/Owlet_Monster.png");
-  rock2.loadFromFile("../assets/2_Owlet_Monster/Rock1.png");
-  Tile tile1(1, rock1, sf::Vector2f(100.0f, 100.0f), sf::Vector2f(0.0f, 0.0f));
-  Tile tile2(2, rock2, sf::Vector2f(230.0f, 280.0f), sf::Vector2f(0.0f, 0.0f));
-  m_map.add_tile(tile1);
-  m_map.add_tile(tile2);
-  m_map.draw(window);
+  stage.add_player(1, {350.f, 350.f});
+  PlayerInputState input_state;
 };
 void Game::run() {
   sf::Clock clock;
   while (window.isOpen()) {
     sf::Time delta_time = clock.restart();
     handle_events();
-    update(delta_time);
-    render();
+    stage.handle_player_input(1, input_state, delta_time.asSeconds());
+    stage.update(delta_time.asSeconds());
+    stage.render(window);
   }
 }
 void Game::handle_events() {
@@ -31,13 +31,12 @@ void Game::handle_events() {
     if (event->is<sf::Event::Closed>()) {
       window.close();
     }
+    input_state.move_left = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A);
+    input_state.move_right = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D);
+    input_state.jump = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+    input_state.attack_melee = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K);
+    input_state.attack_ranged =
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::J);
+    input_state.block = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L);
   }
-}
-void Game::update(sf::Time delta_time) {
-  // Update game logic here
-}
-void Game::render() {
-  window.clear();
-  m_map.draw(window);
-  window.display();
 }
