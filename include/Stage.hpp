@@ -21,6 +21,7 @@ private:
 class Stage {
 public:
   Stage(const GameSettings &settings);
+  void add_tiles(const sf::Vector2f& start_position);
   void add_player(int player_id, const sf::Vector2f &spawn_position);
   void remove_player(int player_id);
 
@@ -40,6 +41,7 @@ private:
 
   GameSettings game_settings;
   Map game_map;
+  std::vector<std::unique_ptr<Tile>> tiles;
   std::map<int, std::unique_ptr<Player>> players;
   std::vector<std::unique_ptr<Projectile>> projectiles;
   ResourceManager resource_manager;

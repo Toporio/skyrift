@@ -34,6 +34,13 @@ Stage::Stage(const GameSettings &settings)
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
+  try {
+      resource_manager.loadTexture("orka_zwisa",
+          Config::ROCK);
+  }
+  catch (const std::runtime_error& e) {
+      std::cerr << "loading texture error" << e.what() << std::endl;
+  }
 }
 
 void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
@@ -47,6 +54,21 @@ void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
               << ". Reason: " << e.what() << std::endl;
   }
 }
+
+void Stage::add_tiles(const sf::Vector2f& start_position) {
+    float tile_width = resource_manager.getTexture("orka_zwisa").getSize().x;
+    for (int i = 0; i < 4; ++i) {
+        sf::Vector2f pos = start_position + sf::Vector2f(i * tile_width, 40.f);
+        auto tile = std::make_unique<Tile>(
+            i,
+            resource_manager.getTexture("orka_zwisa"),
+            pos,
+            sf::Vector2f(0.f, 0.f)
+        );
+        tiles.push_back(std::move(tile));
+    }
+}
+
 void Stage::handle_player_input(int player_id, const PlayerInputState &input,
                                 float delta_time) {
   for (const auto &pair : players) {
@@ -65,6 +87,9 @@ void Stage::update(float delta_time) {
 }
 void Stage::draw(sf::RenderWindow &window) {
   game_map.draw(window);
+  for (const auto& tile : tiles) {
+      tile->draw(window);
+  }
   for (const auto &pair : players) {
     pair.second->draw(window);
   }

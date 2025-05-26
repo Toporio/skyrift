@@ -16,4 +16,5 @@ const std::string BLUE_PLAYER_SPRITES =
     "../assets/Pink_Monster/Pink_Monster.png";
 const std::string PINK_PLAYER_SPRITES = "../assets/pink_player.png";
 const std::string WHITE_PLAYER_SPRITES = "../assets/white_player.png";
+const std::string ROCK = "../assets/Rock1.png";
 } // namespace Config
