@@ -18,6 +18,7 @@ const std::string BLUE_PLAYER_SPRITES =
 const std::string PINK_PLAYER_SPRITES = "../assets/pink_player.png";
 const std::string WHITE_PLAYER_SPRITES = "../assets/white_player.png";
 const std::string TERRAIN_SPRITE = "../assets/terrain.png";
+const std::string SKY_SPRITE = "../assets/sky.png";
 
 const std::string PROJECTILE_SPRITE = "../assets/Pink_Monster/Rock1.png";
 const std::string ROCK = "../assets/Rock1.png";

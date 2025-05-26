@@ -13,7 +13,6 @@ public:
 private:
   void handle_events();
   Stage stage;
-  sf::Texture rock1;
   PlayerInputState input_state;
   Map m_map;
   GameSettings game_settings;
