@@ -30,9 +30,13 @@ void Player::block(bool start_blocking) { return; }
 
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
+  sf::Vector2f projectile_position = {
+      sprite.getPosition().x,
+      sprite.getPosition().y + sprite.getTexture().getSize().y / 2.f};
   auto new_projectile_p = std::make_unique<Projectile>(
       id, stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
-      sprite.getPosition());
+      projectile_position);
+  new_projectile_p->sprite.setScale({5.f, 5.f});
   projectiles.push_back(std::move(new_projectile_p));
   attack_range_cooldown = Config::PLAYER_ATTACK_RANGE__COOLDOWN;
   std::cout << "atak range" << dir_x << std::endl;
