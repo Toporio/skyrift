@@ -31,6 +31,7 @@ Stage::Stage(const GameSettings &settings)
   try {
     resource_manager.loadTexture("jebac_kurwe_disa",
                                  Config::BLUE_PLAYER_SPRITES);
+    resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
@@ -47,7 +48,9 @@ void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
   try {
     auto new_player_p = std::make_unique<Player>(
         player_id, resource_manager.getTexture("jebac_kurwe_disa"),
-        spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives);
+        spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives,
+        *this);
+    new_player_p->sprite.setScale({3.f, 3.f});
     players.emplace(player_id, std::move(new_player_p));
   } catch (const std::runtime_error &e) {
     std::cerr << "Stage: Failed to add player " << player_id
@@ -81,8 +84,17 @@ void Stage::update(float delta_time) {
   for (const auto &pair : players) {
     pair.second->update(delta_time);
   }
-  for (auto &projectile : projectiles) {
-    projectile->update(delta_time);
+  for (auto it = projectiles.begin(); it != projectiles.end();) {
+    if (!(*it)) {
+      it = projectiles.erase(it);
+      continue;
+    }
+    (*it)->update(delta_time);
+    if ((*it)->hp == 0) {
+      projectiles.erase(it);
+    } else {
+      ++it;
+    }
   }
 }
 void Stage::draw(sf::RenderWindow &window) {
