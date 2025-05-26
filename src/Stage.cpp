@@ -3,7 +3,9 @@
 #include "Player.hpp"
 #include "Stage.hpp"
 #include "config.hpp"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
 
@@ -32,7 +34,7 @@ Stage::Stage(const GameSettings &settings)
     resource_manager.loadTexture("jebac_kurwe_disa",
                                  Config::BLUE_PLAYER_SPRITES);
     resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
-    resource_manager.loadTexture("orka_zwisa", Config::ROCK);
+    resource_manager.loadTexture("orka_zwisa", Config::TERRAIN_SPRITE);
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
@@ -53,14 +55,22 @@ void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
 }
 
 void Stage::add_tiles(const sf::Vector2f &start_position) {
-  float tile_width = resource_manager.getTexture("orka_zwisa").getSize().x;
-  for (int i = 1; i < 5; ++i) {
+  sf::IntRect ending_frame(sf::Vector2i{0, 0}, sf::Vector2i{95, 95});
+  sf::IntRect middle_frame(sf::Vector2i{285, 95}, sf::Vector2i{60, 50});
+  sf::IntRect temp;
+  for (int i = 0; i < 5; ++i) {
+    if (i == 0 || i == 4) {
+      temp = ending_frame;
+    } else {
+      temp = middle_frame;
+    }
     sf::Vector2f pos =
-        start_position + sf::Vector2f(i * tile_width + 20.f, 400.f);
+        start_position + sf::Vector2f(i * temp.size.x - 20.f, 400.f);
     auto tile =
         std::make_unique<Tile>(i, resource_manager.getTexture("orka_zwisa"),
                                pos, sf::Vector2f(0.0f, 0.0f));
-    tile->sprite.setScale({5.f, 5.f});
+    tile->sprite.setTextureRect(temp);
+    // tile->sprite.setScale({5.f, 5.f});
     std::cout << tile->sprite.getPosition().x << std::endl;
     tiles.push_back(std::move(tile));
   }
