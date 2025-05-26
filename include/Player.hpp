@@ -4,26 +4,29 @@
 #include "common.hpp"
 #include "config.hpp"
 #include <SFML/Graphics.hpp>
+#include <memory.h>
 
 class Projectile;
-
+class Stage;
 class Player : public Entity {
 private:
   const float move_speed = Config::PLAYER_MOVE_SPEED;
   const float jump_speed = Config::PLAYER_JUMP_SPEED;
   const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS;
   unsigned int current_jumps = 0;
+  Stage &stage_data;
 
 public:
   Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
-         const sf::Vector2f &velocity, unsigned int lives);
+         const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data);
   int lives;
   int dir_x;
   PlayerStatus status;
   float health;
 
   float hit_stun_timer;
-  float attack_cooldown_timer;
+  float attack_melee_cooldown;
+  float attack_range_cooldown;
   float block_cooldown_timer;
 
   void handle_input(const PlayerInputState &input_state, float delta_time);
@@ -37,9 +40,9 @@ public:
   void apply_gravity(float delta_time);
   // player attacks
   void attack_melee(Player &enemy, float dir_x);
-  Projectile attack_ranged();
+  void attack_ranged(std::vector<std::unique_ptr<Projectile>> &projectiles);
   void block(bool start_blocking);
-  // player interactions
+  // player interactionss
   void take_damage(float damage);
   void on_block_attack();
   bool is_alive();

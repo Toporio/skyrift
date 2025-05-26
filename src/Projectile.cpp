@@ -3,8 +3,9 @@
 #include "config.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
-Projectile::Projectile(int id, float dir_x, const sf::Vector2f &position)
-    : Entity(id, sf::Texture(Config::BLUE_PLAYER_SPRITES), position,
+Projectile::Projectile(int id, sf::Texture &texture, float dir_x,
+                       const sf::Vector2f &position)
+    : Entity(id, texture, position,
              sf::Vector2f(dir_x * Config::PROJECTILE_SPEED, 0.f)),
       hp(1) {
   this->sprite.setPosition(position);

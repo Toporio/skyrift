@@ -26,11 +26,17 @@ public:
 
   void handle_player_input(int player_id, const PlayerInputState &input,
                            float delta_time);
+
   void update(float delta_time);
   void render(sf::RenderWindow &window);
   void draw(sf::RenderWindow &window);
   void reset_game();
   Map &get_map() { return game_map; }
+  ResourceManager &get_resource_manager() { return resource_manager; }
+  std::map<int, std::unique_ptr<Player>> &get_players() { return players; };
+  std::vector<std::unique_ptr<Projectile>> &get_projectiles() {
+    return projectiles;
+  };
 
 private:
   void check_player_map_collision(Player &player, float delta_time);
