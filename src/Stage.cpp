@@ -80,14 +80,51 @@ void Stage::handle_player_input(int player_id, const PlayerInputState &input,
                                 float delta_time) {
   for (const auto &pair : players) {
     if (player_id == pair.first) {
-      pair.second->handle_input(input, delta_time);
+      auto a = pair.second->handle_input(input, delta_time);
+      bool b = 0;
+      if (a && !pair.second->IsGrounded) {
+          pair.second->sprite.setPosition(sf::Vector2f(pair.second->position.x + pair.second->velocity.x * delta_time, pair.second->position.y - 1.0f));
+          for (const auto& tile : tiles) {
+              if (pair.second->check_collision(*tile)) {
+                  b = true;
+              }
+          }
+          pair.second->sprite.setPosition(sf::Vector2f(pair.second->position.x - pair.second->velocity.x * delta_time, pair.second->position.y + 1.0f));
+          if (b) {
+              pair.second->velocity.x = 0.0f;
+          }
+      }
     }
   }
 }
 void Stage::update(float delta_time) {
-  for (const auto &pair : players) {
-    pair.second->update(delta_time);
-  }
+    for (const auto& pair : players) {
+        pair.second->update(delta_time);
+        pair.second->IsGrounded = false;
+        auto v = pair.second->velocity;
+        for (const auto& tile : tiles) {
+            if (pair.second->check_collision(*tile)) {
+                sf::FloatRect tileBounds = tile->sprite.getGlobalBounds();
+                sf::FloatRect playerBounds = pair.second->sprite.getGlobalBounds();
+                sf::Vector2f currentPos = pair.second->sprite.getPosition();
+                if (v.y >= 0 && (playerBounds.position.y + playerBounds.size.y) < (tileBounds.position.y + tileBounds.size.y)  ) {
+                    sf::Vector2f newPos(currentPos.x, tileBounds.position.y - playerBounds.size.y);
+                    pair.second->sprite.setPosition(
+                        newPos
+                    );
+					pair.second->velocity.y = 0.0f;
+                    pair.second->IsGrounded = true;
+                }
+                else if(v.y < 0 && playerBounds.position.y > tileBounds.position.y) {
+                    sf::Vector2f newPos(currentPos.x, tileBounds.position.y + tileBounds.size.y + 0.0f);
+                    pair.second->sprite.setPosition(
+                        newPos
+                    );
+                    pair.second->velocity.y = 30.0f;
+                }
+            }
+        }
+    }
   for (auto it = projectiles.begin(); it != projectiles.end();) {
     if (!(*it)) {
       it = projectiles.erase(it);

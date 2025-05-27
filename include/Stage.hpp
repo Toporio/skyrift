@@ -13,7 +13,7 @@ class ResourceManager {
 public:
   sf::Texture &getTexture(const std::string &name);
   void loadTexture(const std::string &name, const std::string &filename);
-
+  
 private:
   std::map<std::string, sf::Texture> textures;
 };

@@ -20,6 +20,7 @@ public:
   Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
          const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data);
   int lives;
+  bool IsGrounded = 1;
   int dir_x;
   PlayerStatus status;
   float health;
@@ -29,7 +30,7 @@ public:
   float attack_range_cooldown;
   float block_cooldown_timer;
 
-  void handle_input(const PlayerInputState &input_state, float delta_time);
+  bool handle_input(const PlayerInputState &input_state, float delta_time);
   void update(float delta_time) override;
   EntityType get_entity_type() const override { return EntityType::PLAYER; };
 

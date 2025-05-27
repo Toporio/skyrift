@@ -60,15 +60,17 @@ void Player::update(float delta_time) {
 }
 void Player::draw(sf::RenderWindow &window) const { window.draw(sprite); }
 
-void Player::handle_input(const PlayerInputState &input_state,
+bool Player::handle_input(const PlayerInputState &input_state,
                           float delta_time) {
-
+    bool lr = 0;
   float move_direction = 0.0f;
   if (input_state.move_left) {
     move_direction -= 1.0f;
+    lr = 1;
   }
   if (input_state.move_right) {
     move_direction += 1.0f;
+    lr = 1;
   }
   if (move_direction != 0.f)
     dir_x = move_direction;
@@ -92,4 +94,5 @@ void Player::handle_input(const PlayerInputState &input_state,
   if (input_state.block) {
     block(true);
   }
+  return lr;
 }
