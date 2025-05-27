@@ -5,6 +5,7 @@
 #include "config.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
@@ -56,21 +57,22 @@ void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
 
 void Stage::add_tiles(const sf::Vector2f &start_position) {
   sf::IntRect ending_frame(sf::Vector2i{0, 0}, sf::Vector2i{95, 95});
-  sf::IntRect middle_frame(sf::Vector2i{285, 95}, sf::Vector2i{60, 50});
+  sf::IntRect middle_frame(sf::Vector2i{288, 96}, sf::Vector2i{64, 64});
   sf::IntRect temp;
+  sf::Vector2f scale{1.f, 1.f};
   for (int i = 0; i < 5; ++i) {
     if (i == 0 || i == 4) {
       temp = ending_frame;
     } else {
       temp = middle_frame;
+      scale = {1.5f, 1.5f};
     }
-    sf::Vector2f pos =
-        start_position + sf::Vector2f(i * temp.size.x - 20.f, 400.f);
+    sf::Vector2f pos = start_position + sf::Vector2f(i * temp.size.x, 400.f);
     auto tile =
         std::make_unique<Tile>(i, resource_manager.getTexture("orka_zwisa"),
                                pos, sf::Vector2f(0.0f, 0.0f));
     tile->sprite.setTextureRect(temp);
-    // tile->sprite.setScale({5.f, 5.f});
+    tile->sprite.setScale(scale);
     std::cout << tile->sprite.getPosition().x << std::endl;
     tiles.push_back(std::move(tile));
   }
@@ -150,7 +152,7 @@ void Stage::draw(sf::RenderWindow &window) {
   }
 }
 void Stage::render(sf::RenderWindow &window) {
-  window.clear();
+  window.clear(sf::Color::Yellow);
   draw(window);
   window.display();
 }
