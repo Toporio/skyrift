@@ -35,6 +35,7 @@ void Player::attack_animation()
     int off_set = 32 * frame;
     sf::Vector2i offset(off_set, 0);
     sf::Vector2i size(32, 32);
+    sprite.setTexture(all_texxt);
     sprite.setTextureRect(sf::IntRect(offset, size));
 }
 void Player::attack_ranged(
