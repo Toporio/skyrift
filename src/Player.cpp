@@ -8,11 +8,11 @@
 
 Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
                const sf::Vector2f &velocity, unsigned int lives,
-               Stage &stage_data)
+               Stage &stage_data, const sf::Texture& all_texture)
     : Entity(id, texture, position, velocity), lives(lives),
       status(PlayerStatus::IDLE), current_jumps(0), dir_x(1),
       stage_data(stage_data),
-      attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN) {}
+      attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN), all_texxt(all_texture) {}
 void Player::jump() { velocity.y = -jump_speed; };
 void Player::apply_gravity(float delta_time) {
   velocity.y += Config::GRAVITY * delta_time;
@@ -28,6 +28,15 @@ void Player::move(float direction) {
 
 void Player::block(bool start_blocking) { return; }
 
+void Player::attack_animation()
+{
+    auto mele_att_cd = (Config::PLAYER_ATTACK_MELEE__COOLDOWN / 4);
+    int frame = int(attack_melee_cooldown / mele_att_cd);
+    int off_set = 32 * frame;
+    sf::Vector2i offset(off_set, 0);
+    sf::Vector2i size(32, 32);
+    sprite.setTextureRect(sf::IntRect(offset, size));
+}
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
   sf::Vector2f projectile_position = {

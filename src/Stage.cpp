@@ -36,6 +36,7 @@ Stage::Stage(const GameSettings &settings)
                                  Config::BLUE_PLAYER_SPRITES);
     resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
     resource_manager.loadTexture("orka_zwisa", Config::TERRAIN_SPRITE);
+    resource_manager.loadTexture("all_sprites", Config::PLAYER_ATTACK);
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
@@ -46,7 +47,7 @@ void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
     auto new_player_p = std::make_unique<Player>(
         player_id, resource_manager.getTexture("jebac_kurwe_disa"),
         spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives,
-        *this);
+        *this, resource_manager.getTexture("all_sprites"));
     new_player_p->sprite.setScale({3.f, 3.f});
     players.emplace(player_id, std::move(new_player_p));
   } catch (const std::runtime_error &e) {
