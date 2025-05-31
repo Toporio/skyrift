@@ -12,7 +12,7 @@ Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
     : Entity(id, texture, position, velocity), lives(lives),
       status(PlayerStatus::IDLE), current_jumps(0), dir_x(1),
       stage_data(stage_data),
-      attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN), all_texxt(all_texture) {}
+      attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN), all_texxt(all_texture), basic_texture(texture) {}
 void Player::jump() { velocity.y = -jump_speed; };
 void Player::apply_gravity(float delta_time) {
   velocity.y += Config::GRAVITY * delta_time;
@@ -28,7 +28,7 @@ void Player::move(float direction) {
 
 void Player::block(bool start_blocking) { return; }
 
-void Player::attack_animation()
+bool Player::attack_animation()
 {
     auto mele_att_cd = (Config::PLAYER_ATTACK_MELEE__COOLDOWN / 4);
     int frame = int(attack_melee_cooldown / mele_att_cd);
@@ -37,6 +37,14 @@ void Player::attack_animation()
     sf::Vector2i size(32, 32);
     sprite.setTexture(all_texxt);
     sprite.setTextureRect(sf::IntRect(offset, size));
+    if (attack_melee_cooldown <= 0)
+    {
+        this->IsAttacking = 0;
+        attack_melee_cooldown = 0;
+        return 1;
+        sprite.setTexture(basic_texture);
+    }
+    return 0;
 }
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
@@ -52,57 +60,66 @@ void Player::attack_ranged(
   std::cout << "atak range" << dir_x << std::endl;
 }
 
-void Player::attack_melee(Player &enemy, float dir_x) {
-  this->sprite.move(sf::Vector2f((dir_x > 0 ? 10.f : -10.f), 0.f));
+void Player::attack_melee(Player &enemy) {
+  this->sprite.move(sf::Vector2f((this->dir_x > 0 ? 10.f : -10.f), 0.f));
   if (this->check_collision(enemy)) {
-    enemy.health--;
+    enemy.take_damage(this->dir_x);
   }
-  this->sprite.move(sf::Vector2f((dir_x > 0 ? -10.f : 10.f), 0.f));
+  this->sprite.move(sf::Vector2f((this->dir_x > 0 ? -10.f : 10.f), 0.f));
   std::cout << "atak mele" << std::endl;
 }
 void Player::update(float delta_time) {
   if (attack_range_cooldown > 0)
     attack_range_cooldown -= delta_time;
+  if (attack_melee_cooldown > 0)
+    attack_melee_cooldown -= delta_time;
   position.x += velocity.x * delta_time;
   position.y += velocity.y * delta_time;
   apply_gravity(delta_time);
   sprite.setPosition(position);
+  if (attack_melee_cooldown > 0)
+      attack_animation();
 }
 void Player::draw(sf::RenderWindow &window) const { window.draw(sprite); }
-
+void Player::take_damage(float dir) {
+    this->health++;
+    this->velocity.x = 0.1f * (this->health) * dir;
+    this->velocity.y = 0.05f * (this->health);
+    this->stun_timer = 0.05f * (this->health);
+}
 bool Player::handle_input(const PlayerInputState &input_state,
                           float delta_time) {
     bool lr = 0;
   float move_direction = 0.0f;
-  if (input_state.move_left) {
-    move_direction -= 1.0f;
-    lr = 1;
-  }
-  if (input_state.move_right) {
-    move_direction += 1.0f;
-    lr = 1;
-  }
-  if (move_direction != 0.f)
-    dir_x = move_direction;
-  move(move_direction);
-  if (input_state.attack_melee) {
-    std::map<int, std::unique_ptr<Player>> &players = stage_data.get_players();
-    for (const auto &pair : players) {
-      attack_melee(*pair.second, dir_x);
-    }
-  }
-  if (input_state.attack_ranged) {
-    if (attack_range_cooldown <= 0) {
-      std::vector<std::unique_ptr<Projectile>> &projectiles =
-          stage_data.get_projectiles();
-      attack_ranged(projectiles);
-    }
-  }
-  if (input_state.jump) {
-    jump();
-  }
-  if (input_state.block) {
-    block(true);
+  if (!IsAttacking)
+  {
+      if (input_state.move_left) {
+          move_direction -= 1.0f;
+          lr = 1;
+      }
+      if (input_state.move_right) {
+          move_direction += 1.0f;
+          lr = 1;
+      }
+      if (move_direction != 0.f)
+          dir_x = move_direction;
+      move(move_direction);
+      if (input_state.attack_melee) {
+          IsAttacking = 1;
+      }
+      if (input_state.attack_ranged) {
+          if (attack_range_cooldown <= 0) {
+              std::vector<std::unique_ptr<Projectile>>& projectiles =
+                  stage_data.get_projectiles();
+              attack_ranged(projectiles);
+          }
+      }
+      if (input_state.jump) {
+          jump();
+      }
+      if (input_state.block) {
+          block(true);
+      }
   }
   return lr;
 }

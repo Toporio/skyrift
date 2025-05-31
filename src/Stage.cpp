@@ -127,6 +127,15 @@ void Stage::update(float delta_time) {
                 }
             }
         }
+        if (pair.second->IsAttacking)
+        {
+            if (pair.second->attack_animation())
+            {
+                for (const auto& enemy : players) {
+                    //tutaj wywolania atack_melee na oponentach
+                }
+            }
+        }
     }
   for (auto it = projectiles.begin(); it != projectiles.end();) {
     if (!(*it)) {
