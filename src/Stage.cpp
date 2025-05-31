@@ -136,6 +136,15 @@ void Stage::update(float delta_time) {
                 }
             }
         }
+    if (pair.second->sprite.getGlobalBounds().getCenter().x < 0 || pair.second->sprite.getGlobalBounds().getCenter().x > Config::WINDOW_WIDTH || pair.second->sprite.getGlobalBounds().getCenter().y < 0 || pair.second->sprite.getGlobalBounds().getCenter().y > Config::WINDOW_HEIGHT)
+        pair.second->position.x = 100.0f;
+        pair.second->position.y = 100.0f;
+        pair.second->sprite.setPosition(sf::Vector2f(100.0f, 100.0f));
+        pair.second->lives--;
+        pair.second->health = 0;
+        pair.second->velocity.y = 0;
+        pair.second->velocity.x = 0;
+        pair.second->IsGrounded = 1;
     }
   for (auto it = projectiles.begin(); it != projectiles.end();) {
     if (!(*it)) {
