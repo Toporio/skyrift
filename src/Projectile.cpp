@@ -7,7 +7,7 @@ Projectile::Projectile(int id, sf::Texture &texture, float dir_x,
                        const sf::Vector2f &position)
     : Entity(id, texture, position,
              sf::Vector2f(dir_x * Config::PROJECTILE_SPEED, 0.f)),
-      hp(1) {
+      hp(1), dir_x(dir_x) {
   this->sprite.setPosition(position);
 }
 

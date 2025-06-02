@@ -21,6 +21,9 @@ file(GLOB_RECURSE PROJECT_SOURCES
 )
 
 add_executable(skyrift ${PROJECT_SOURCES})
+add_custom_command(TARGET skyrift POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:skyrift>/assets)
 target_include_directories(skyrift PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_compile_features(skyrift PRIVATE cxx_std_17)
 target_link_libraries(skyrift PRIVATE

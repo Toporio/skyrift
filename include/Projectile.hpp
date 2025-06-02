@@ -14,6 +14,7 @@ public:
   EntityType get_entity_type() const override;
   bool check_collision(const Entity &other) const override;
   int get_id() const;
+  float dir_x;
   float damage = Config::PROJECTILE_DAMAGE;
   int hp;
 };
