@@ -104,8 +104,9 @@ bool Player::handle_input(const PlayerInputState &input_state,
       if (move_direction != 0.f)
           dir_x = move_direction;
       move(move_direction);
-      if (input_state.attack_melee) {
+      if (input_state.attack_melee && !IsAttacking) {
           IsAttacking = 1;
+          attack_melee_cooldown = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
       }
       if (input_state.attack_ranged) {
           if (attack_range_cooldown <= 0) {
@@ -120,6 +121,9 @@ bool Player::handle_input(const PlayerInputState &input_state,
       if (input_state.block) {
           block(true);
       }
+	  if (attack_melee_cooldown > 0 && IsAttacking) {
+		  attack_animation();
+	  }
   }
   return lr;
 }
