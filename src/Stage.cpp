@@ -105,10 +105,10 @@ void Stage::update(float delta_time) {
         pair.second->update(delta_time);
         pair.second->IsGrounded = false;
         auto v = pair.second->velocity;
+        sf::FloatRect playerBounds = pair.second->sprite.getGlobalBounds();
         for (const auto& tile : tiles) {
             if (pair.second->check_collision(*tile)) {
                 sf::FloatRect tileBounds = tile->sprite.getGlobalBounds();
-                sf::FloatRect playerBounds = pair.second->sprite.getGlobalBounds();
                 sf::Vector2f currentPos = pair.second->sprite.getPosition();
                 if (v.y >= 0 && (playerBounds.position.y + playerBounds.size.y) < (tileBounds.position.y + tileBounds.size.y)  ) {
                     sf::Vector2f newPos(currentPos.x, tileBounds.position.y - playerBounds.size.y);
@@ -136,15 +136,19 @@ void Stage::update(float delta_time) {
                 }
             }
         }
-    if (pair.second->sprite.getGlobalBounds().getCenter().x < 0 || pair.second->sprite.getGlobalBounds().getCenter().x > Config::WINDOW_WIDTH || pair.second->sprite.getGlobalBounds().getCenter().y < 0 || pair.second->sprite.getGlobalBounds().getCenter().y > Config::WINDOW_HEIGHT)
-        pair.second->position.x = 100.0f;
-        pair.second->position.y = 100.0f;
-        pair.second->sprite.setPosition(sf::Vector2f(100.0f, 100.0f));
-        pair.second->lives--;
-        pair.second->health = 0;
-        pair.second->velocity.y = 0;
-        pair.second->velocity.x = 0;
-        pair.second->IsGrounded = 1;
+        auto x_side = playerBounds.getCenter().x;
+        auto y_side = playerBounds.getCenter().y;
+        if (x_side < 0 || x_side > Config::WINDOW_WIDTH || y_side < 0 || y_side > Config::WINDOW_HEIGHT) {
+            std::cout << x_side << y_side;
+            pair.second->position.x = 400.0f;
+            pair.second->position.y = 100.0f;
+            pair.second->sprite.setPosition(sf::Vector2f(400.0f, 100.0f));
+            pair.second->lives--;
+            pair.second->health = 0;
+            pair.second->velocity.y = 0;
+            pair.second->velocity.x = 0;
+            pair.second->IsGrounded = 1;
+        }
     }
   for (auto it = projectiles.begin(); it != projectiles.end();) {
     if (!(*it)) {
