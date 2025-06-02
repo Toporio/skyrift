@@ -108,11 +108,36 @@ void Stage::update(float delta_time) {
   for (const auto &pair : players) {
     pair.second->update(delta_time);
     check_player_map_collision(*pair.second, delta_time);
+    auto x_side = pair.second->sprite.getGlobalBounds().getCenter().x;
+    auto y_side = pair.second->sprite.getGlobalBounds().getCenter().y;
+    if (x_side < 0 || x_side > Config::WINDOW_WIDTH ||
+        y_side > Config::WINDOW_HEIGHT) {
+      std::cout << x_side << y_side;
+      pair.second->position.x = 400.0f;
+      pair.second->position.y = 100.0f;
+      pair.second->sprite.setPosition(sf::Vector2f(400.0f, 100.0f));
+      pair.second->lives--;
+      pair.second->health = 0;
+      pair.second->velocity.y = 0;
+      pair.second->velocity.x = 0;
+      pair.second->IsGrounded = 1;
+    }
   }
   for (const auto &projectile : projectiles) {
     projectile->update(delta_time);
   }
   check_player_projectile_collision();
+  projectiles.erase(
+      std::remove_if(projectiles.begin(), projectiles.end(),
+                     [](const std::unique_ptr<Projectile> &p_ptr) {
+                       if (!p_ptr) {
+                         return true; // Usuń puste wskaźniki (zabezpieczenie)
+                       }
+                       // Pocisk jest usuwany, jeśli jest oznaczony LUB jego
+                       // czas życia minął (is_expired)
+                       return p_ptr->hp == 0 /* || p_ptr->is_expired() */;
+                     }),
+      projectiles.end());
 }
 void Stage::draw(sf::RenderWindow &window) {
   for (const auto &tile : tiles) {
@@ -131,8 +156,7 @@ void Stage::render(sf::RenderWindow &window) {
   window.display();
 }
 void Stage::check_player_projectile_collision() {
-  for (auto &player_pair : players) { // player_pair to std::pair<const int,
-    // std::cout << player_pair.first << std::endl; // std::unique_ptr<Player>>&
+  for (auto &player_pair : players) {
     std::unique_ptr<Player> &player_p = player_pair.second;
 
     if (!player_p) {
@@ -143,14 +167,12 @@ void Stage::check_player_projectile_collision() {
       if (!projectile_p) {
         continue;
       }
-      // std::cout << "jEBAC " << std::endl;
       if (player_p->get_player_id() == projectile_p->get_id()) {
         continue;
       }
       if (player_p->check_collision(*projectile_p)) {
         player_p->take_damage(projectile_p->dir_x);
         projectile_p->hp--;
-        std::cout << "jEBAC DISA" << std::endl;
       }
     }
   }
