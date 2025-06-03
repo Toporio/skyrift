@@ -30,6 +30,8 @@ public:
   float attack_melee_cooldown;
   float attack_range_cooldown;
   float block_cooldown_timer;
+  float block_timer = 0;
+  float dmg_timer = 0;
   sf::Texture all_texxt;
   sf::Texture basic_texture;
 
@@ -46,7 +48,7 @@ public:
   // player attacks
   void attack_melee(Player &enemy);
   void attack_ranged(std::vector<std::unique_ptr<Projectile>> &projectiles);
-  void block(bool start_blocking);
+  void block();
   // player interactionss
   void take_damage(float dir);
   void on_block_attack();
