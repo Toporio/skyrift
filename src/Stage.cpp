@@ -36,7 +36,7 @@ Stage::Stage(const GameSettings &settings)
                                  Config::BLUE_PLAYER_SPRITES);
     resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
     resource_manager.loadTexture("orka_zwisa", Config::TERRAIN_SPRITE);
-    resource_manager.loadTexture("all_sprites", Config::PLAYER_ATTACK);
+    resource_manager.loadTexture("all_sprites", Config::PINK_PLAYER_SPRITES);
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
@@ -93,7 +93,7 @@ void Stage::handle_player_input(int player_id, const PlayerInputState &input,
     if (player_id == pair.first) {
       auto a = pair.second->handle_input(input, delta_time);
       bool b = 0;
-      if (a && !pair.second->IsGrounded) {
+      if (a && !pair.second->is_grounded) {
         pair.second->sprite.setPosition(sf::Vector2f(
             pair.second->position.x + pair.second->velocity.x * delta_time,
             pair.second->position.y - 1.0f));
@@ -125,7 +125,7 @@ void Stage::check_player_out_of_map(Player &player) {
     player.health = 0;
     player.velocity.y = 0;
     player.velocity.x = 0;
-    player.IsGrounded = 0;
+    player.is_grounded = 0;
   }
 }
 void Stage::update(float delta_time) {
@@ -190,7 +190,7 @@ void Stage::check_player_projectile_collision() {
 }
 void Stage::check_player_map_collision(Player &player, float delta_time) {
   sf::FloatRect player_bounds = player.sprite.getGlobalBounds();
-  player.IsGrounded = false;
+  player.is_grounded = false;
   //  player_bounds.size.x -= 40;
   // player_bounds.position.x += 20;
   for (const auto &tile_p : tiles) {
@@ -223,7 +223,7 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
         if (overlap_top < overlap_bottom) {
           player.position.y -= penetration_y;
           player.velocity.y = 0.f;
-          player.IsGrounded = true;
+          player.is_grounded = true;
         } else {
           player.position.y += penetration_y;
           player.velocity.y = 0.f;

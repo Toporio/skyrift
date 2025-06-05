@@ -25,6 +25,8 @@ struct PlayerSnapshot {
   PlayerStatus status;
   float dir_x;
   bool is_grounded;
+  int lives;
+  float health;
 };
 struct PlayerInputState {
   bool move_left = false;

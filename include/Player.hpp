@@ -15,6 +15,13 @@ private:
   const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS;
   unsigned int current_jumps = 0;
   float jump_cooldown_timer = 0;
+  float stun_timer;
+  float attack_melee_cooldown;
+  float attack_range_cooldown;
+  float block_cooldown_timer;
+  float block_timer;
+  float dmg_timer;
+  float animation_timer;
   Stage &stage_data;
 
 public:
@@ -22,18 +29,12 @@ public:
          const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data,
          const sf::Texture &all_texture);
   int lives;
-  bool is_grounded = 0;
-  bool IsAttacking = 0;
+  bool is_grounded;
+  //  bool IsAttacking = 0;
   int dir_x;
   PlayerStatus status;
   float health;
 
-  float stun_timer;
-  float attack_melee_cooldown;
-  float attack_range_cooldown;
-  float block_cooldown_timer;
-  float block_timer = 0;
-  float dmg_timer = 0;
   sf::Texture all_texxt;
   sf::Texture basic_texture;
 
