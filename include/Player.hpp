@@ -38,7 +38,6 @@ public:
   sf::Texture all_texxt;
   sf::Texture basic_texture;
 
-  bool attack_animation();
   bool handle_input(const PlayerInputState &input_state, float delta_time);
   void update(float delta_time) override;
   EntityType get_entity_type() const override { return EntityType::PLAYER; };
@@ -58,6 +57,8 @@ public:
   bool is_alive();
   void reset_player();
   void draw(sf::RenderWindow &window) const override;
+  void set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
+                     int frame_height, float delta_time);
   // getters
   int get_player_id() const { return id; }
 };

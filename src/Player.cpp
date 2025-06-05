@@ -22,6 +22,7 @@ Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
   dmg_timer = 0.f;
   stun_timer = 0.f;
   block_timer = 0.f;
+  sprite.setTexture(all_texxt);
 }
 void Player::jump() {
   if (status == PlayerStatus::HIT_STUN)
@@ -44,21 +45,6 @@ void Player::block() {
   block_timer = Config::PLAYER_BLOCK_TIMER;
 }
 
-bool Player::attack_animation() {
-  auto mele_att_cd = (Config::PLAYER_ATTACK_MELEE__COOLDOWN / 4);
-  int frame = int(attack_melee_cooldown / mele_att_cd);
-  int off_set = 32 * frame;
-  sf::Vector2i offset(off_set, 0);
-  sf::Vector2i size(32, 32);
-  sprite.setTexture(all_texxt);
-  sprite.setTextureRect(sf::IntRect(offset, size));
-  if (attack_melee_cooldown <= 0) {
-    attack_melee_cooldown = 0;
-    sprite.setTexture(basic_texture);
-    return 1;
-  }
-  return 0;
-}
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
   sf::Vector2f projectile_position = {
@@ -100,9 +86,10 @@ void Player::update(float delta_time) {
     }
     break;
   }
+
   case PlayerStatus::ATTACKING_MELEE: {
     const float ATTACK_ANIMATION = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
-    const int ATTACK_FRAMES = 4;
+    const int ATTACK_FRAMES = 6;
     const float FRAME_DURATION = ATTACK_ANIMATION / ATTACK_FRAMES;
     animation_timer += delta_time;
     int frame = static_cast<int>(animation_timer / FRAME_DURATION);
@@ -111,9 +98,9 @@ void Player::update(float delta_time) {
       status = is_grounded ? PlayerStatus::IDLE : PlayerStatus::FALLING;
     }
 
-    std::cout << frame << std::endl;
-    sprite.setTexture(all_texxt);
-    sprite.setTextureRect(sf::IntRect({frame * 32, 98}, {32, 32}));
+    std::cout << is_grounded << std::endl;
+    // sprite.setTexture(all_texxt);
+    sprite.setTextureRect(sf::IntRect({230 + frame * 32, 162}, {30, 28}));
 
     for (auto &pair : stage_data.get_players()) {
       if (pair.first != id) {
@@ -157,6 +144,20 @@ void Player::update(float delta_time) {
   apply_gravity(delta_time);
   position += velocity * delta_time;
   sprite.setPosition(position);
+}
+void Player::set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
+                           int frame_height, float delta_time) {
+  const float ATTACK_ANIMATION = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
+  const int ATTACK_FRAMES = frame_num;
+  const float FRAME_DURATION = ATTACK_ANIMATION / ATTACK_FRAMES;
+  animation_timer += delta_time;
+  int frame = static_cast<int>(animation_timer / FRAME_DURATION);
+  if (frame >= ATTACK_FRAMES) {
+    frame = 0;
+    status = is_grounded ? PlayerStatus::IDLE : PlayerStatus::FALLING;
+  }
+  sprite.setTextureRect(sf::IntRect({x_pos + frame * frame_width, y_pos},
+                                    {frame_width, frame_height}));
 }
 void Player::draw(sf::RenderWindow &window) const {
   sf::Sprite sprite_to_draw = sprite;
