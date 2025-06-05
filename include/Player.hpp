@@ -14,28 +14,30 @@ private:
   const float jump_speed = Config::PLAYER_JUMP_SPEED;
   const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS;
   unsigned int current_jumps = 0;
-  Stage &stage_data;
-
-public:
-  Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
-         const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data, const sf::Texture& all_texture);
-  int lives;
-  bool IsGrounded = 1;
-  bool IsAttacking = 0;
-  int dir_x;
-  PlayerStatus status;
-  float health;
-
+  float jump_cooldown_timer = 0;
   float stun_timer;
   float attack_melee_cooldown;
   float attack_range_cooldown;
   float block_cooldown_timer;
-  float block_timer = 0;
-  float dmg_timer = 0;
+  float block_timer;
+  float dmg_timer;
+  float animation_timer;
+  Stage &stage_data;
+
+public:
+  Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
+         const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data,
+         const sf::Texture &all_texture);
+  int lives;
+  bool is_grounded;
+  //  bool IsAttacking = 0;
+  int dir_x;
+  PlayerStatus status;
+  float health;
+
   sf::Texture all_texxt;
   sf::Texture basic_texture;
 
-  bool attack_animation();
   bool handle_input(const PlayerInputState &input_state, float delta_time);
   void update(float delta_time) override;
   EntityType get_entity_type() const override { return EntityType::PLAYER; };
@@ -55,6 +57,8 @@ public:
   bool is_alive();
   void reset_player();
   void draw(sf::RenderWindow &window) const override;
+  void set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
+                     int frame_height, float delta_time, bool loop);
   // getters
   int get_player_id() const { return id; }
 };
