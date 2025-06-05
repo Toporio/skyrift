@@ -58,7 +58,7 @@ public:
   void reset_player();
   void draw(sf::RenderWindow &window) const override;
   void set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
-                     int frame_height, float delta_time);
+                     int frame_height, float delta_time, bool loop);
   // getters
   int get_player_id() const { return id; }
 };

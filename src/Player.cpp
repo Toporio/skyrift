@@ -146,15 +146,15 @@ void Player::update(float delta_time) {
   sprite.setPosition(position);
 }
 void Player::set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
-                           int frame_height, float delta_time) {
+                           int frame_height, float delta_time,
+                           bool loop = false) {
   const float ATTACK_ANIMATION = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
   const int ATTACK_FRAMES = frame_num;
   const float FRAME_DURATION = ATTACK_ANIMATION / ATTACK_FRAMES;
   animation_timer += delta_time;
   int frame = static_cast<int>(animation_timer / FRAME_DURATION);
   if (frame >= ATTACK_FRAMES) {
-    frame = 0;
-    status = is_grounded ? PlayerStatus::IDLE : PlayerStatus::FALLING;
+    frame = loop ? 0 : ATTACK_FRAMES - 1;
   }
   sprite.setTextureRect(sf::IntRect({x_pos + frame * frame_width, y_pos},
                                     {frame_width, frame_height}));
