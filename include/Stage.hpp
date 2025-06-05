@@ -13,7 +13,7 @@ class ResourceManager {
 public:
   sf::Texture &getTexture(const std::string &name);
   void loadTexture(const std::string &name, const std::string &filename);
-  
+
 private:
   std::map<std::string, sf::Texture> textures;
 };
@@ -44,7 +44,7 @@ private:
   void check_projectile_map_collision(Projectile &projectile);
   void check_player_projectile_collision();
   void check_player_attack_collision();
-
+  void check_player_out_of_map(Player &player);
   GameSettings game_settings;
   Map game_map;
 

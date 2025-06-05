@@ -27,9 +27,10 @@ void Player::move(float direction) {
     status = PlayerStatus::IDLE;
 }
 
-void Player::block() { 
-    block_cooldown_timer = Config::PLAYER_BLOCK_COOLDOWN;
-    block_timer = Config::PLAYER_BLOCK_TIMER;
+void Player::block() {
+  std::cout << "block dmg" << std::endl;
+  block_cooldown_timer = Config::PLAYER_BLOCK_COOLDOWN;
+  block_timer = Config::PLAYER_BLOCK_TIMER;
 }
 
 bool Player::attack_animation() {
@@ -77,9 +78,9 @@ void Player::update(float delta_time) {
   if (attack_melee_cooldown > 0)
     attack_melee_cooldown -= delta_time;
   if (block_cooldown_timer > 0)
-	  block_cooldown_timer -= delta_time;
+    block_cooldown_timer -= delta_time;
   if (dmg_timer > 0)
-	  dmg_timer -= delta_time;
+    dmg_timer -= delta_time;
   position.x += velocity.x * delta_time;
   position.y += velocity.y * delta_time;
   apply_gravity(delta_time);
@@ -93,9 +94,9 @@ void Player::update(float delta_time) {
 }
 void Player::draw(sf::RenderWindow &window) const { window.draw(sprite); }
 void Player::take_damage(float dir) {
-    if (block_timer > 0 || dmg_timer > 0) {
-		return;
-	}
+  if (block_timer > 0 || dmg_timer > 0) {
+    return;
+  }
   this->health++;
   this->velocity.x = 5.f * (this->health) * dir;
   this->velocity.y = -10.f * (this->health);

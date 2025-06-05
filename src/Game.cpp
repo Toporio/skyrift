@@ -14,6 +14,7 @@ Game::Game()
       m_map(), stage({2, 2}) {
   window.setFramerateLimit(Config::FPS_LIMIT);
   stage.add_player(1, {350.f, 350.f});
+  stage.add_player(2, {450.f, 350.f});
   stage.add_tiles({50.f, 50.f});
   PlayerInputState input_state;
 };
