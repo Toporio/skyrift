@@ -1,4 +1,5 @@
 #pragma once
+#include "common.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <string>
 #include <vector>
@@ -16,6 +17,14 @@ enum class PlayerStatus {
   BLOCKING,
   HIT_STUN,
   DEAD
+};
+struct PlayerSnapshot {
+  int id;
+  sf::Vector2f position;
+  sf::Vector2f velocity;
+  PlayerStatus status;
+  float dir_x;
+  bool is_grounded;
 };
 struct PlayerInputState {
   bool move_left = false;

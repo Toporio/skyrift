@@ -14,13 +14,15 @@ private:
   const float jump_speed = Config::PLAYER_JUMP_SPEED;
   const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS;
   unsigned int current_jumps = 0;
+  float jump_cooldown_timer = 0;
   Stage &stage_data;
 
 public:
   Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
-         const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data, const sf::Texture& all_texture);
+         const sf::Vector2f &velocity, unsigned int lives, Stage &stage_data,
+         const sf::Texture &all_texture);
   int lives;
-  bool IsGrounded = 1;
+  bool is_grounded = 0;
   bool IsAttacking = 0;
   int dir_x;
   PlayerStatus status;

@@ -61,19 +61,27 @@ void Stage::add_tiles(const sf::Vector2f &start_position) {
   sf::IntRect middle_frame(sf::Vector2i{288, 96}, sf::Vector2i{64, 64});
   sf::IntRect temp;
   sf::Vector2f scale{1.f, 1.f};
-  for (int i = 0; i < 5; ++i) {
-    if (i == 0 || i == 4) {
+  float x_offset = 0.f;
+  float y_offset = 0.f;
+  for (int i = 0; i < 6; ++i) {
+    if (i == 0 || i == 5) {
       temp = ending_frame;
+      if (i == 5) {
+        y_offset = -100.f;
+        x_offset += 150.f;
+      }
+      scale = {1.f, 1.f};
     } else {
       temp = middle_frame;
       scale = {1.5f, 1.5f};
     }
-    sf::Vector2f pos = start_position + sf::Vector2f(i * temp.size.x, 400.f);
+    sf::Vector2f pos = start_position + sf::Vector2f(x_offset, y_offset);
     auto tile =
         std::make_unique<Tile>(i, resource_manager.getTexture("orka_zwisa"),
                                pos, sf::Vector2f(0.0f, 0.0f));
     tile->sprite.setTextureRect(temp);
     tile->sprite.setScale(scale);
+    x_offset += temp.size.x * scale.x;
     std::cout << tile->sprite.getPosition().x << std::endl;
     tiles.push_back(std::move(tile));
   }
@@ -107,17 +115,17 @@ void Stage::handle_player_input(int player_id, const PlayerInputState &input,
 void Stage::check_player_out_of_map(Player &player) {
   auto x_side = player.sprite.getGlobalBounds().getCenter().x;
   auto y_side = player.sprite.getGlobalBounds().getCenter().y;
-  if (x_side < 0 || x_side > Config::WINDOW_WIDTH ||
-      y_side > Config::WINDOW_HEIGHT) {
+  if (x_side < -500 || x_side > Config::WINDOW_WIDTH + 500 ||
+      y_side > Config::WINDOW_HEIGHT + 500) {
     std::cout << x_side << y_side;
     player.position.x = 400.0f;
     player.position.y = 100.0f;
-    player.sprite.setPosition(sf::Vector2f(400.0f, 100.0f));
+    player.sprite.setPosition(sf::Vector2f(640.0f, -100.0f));
     player.lives--;
     player.health = 0;
     player.velocity.y = 0;
     player.velocity.x = 0;
-    player.IsGrounded = 1;
+    player.IsGrounded = 0;
   }
 }
 void Stage::update(float delta_time) {
@@ -182,6 +190,7 @@ void Stage::check_player_projectile_collision() {
 }
 void Stage::check_player_map_collision(Player &player, float delta_time) {
   sf::FloatRect player_bounds = player.sprite.getGlobalBounds();
+  player.IsGrounded = false;
   //  player_bounds.size.x -= 40;
   // player_bounds.position.x += 20;
   for (const auto &tile_p : tiles) {

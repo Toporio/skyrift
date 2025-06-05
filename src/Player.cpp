@@ -14,7 +14,13 @@ Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
       stage_data(stage_data),
       attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN),
       all_texxt(all_texture), basic_texture(texture) {}
-void Player::jump() { velocity.y = -jump_speed; };
+void Player::jump() {
+  if (jump_cooldown_timer <= 0 && current_jumps < max_jumps) {
+    jump_cooldown_timer = Config::PLAYER_JUMP_COOLDOWN;
+    current_jumps += 1;
+    velocity.y = -jump_speed;
+  }
+};
 void Player::apply_gravity(float delta_time) {
   velocity.y += Config::GRAVITY * delta_time;
 }
@@ -52,12 +58,12 @@ bool Player::attack_animation() {
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
   sf::Vector2f projectile_position = {
-      sprite.getPosition().x,
-      sprite.getPosition().y + sprite.getTexture().getSize().y / 2.f};
+      sprite.getPosition().x + sprite.getTexture().getSize().x,
+      sprite.getPosition().y + sprite.getTexture().getSize().y};
   auto new_projectile_p = std::make_unique<Projectile>(
       id, stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
       projectile_position);
-  new_projectile_p->sprite.setScale({5.f, 5.f});
+  new_projectile_p->sprite.setScale({2.f, 2.f});
   projectiles.push_back(std::move(new_projectile_p));
   attack_range_cooldown = Config::PLAYER_ATTACK_RANGE__COOLDOWN;
   std::cout << "atak range" << dir_x << std::endl;
@@ -79,10 +85,15 @@ void Player::update(float delta_time) {
     attack_melee_cooldown -= delta_time;
   if (block_cooldown_timer > 0)
     block_cooldown_timer -= delta_time;
+  if (jump_cooldown_timer > 0)
+    jump_cooldown_timer -= delta_time;
   if (dmg_timer > 0)
     dmg_timer -= delta_time;
   position.x += velocity.x * delta_time;
   position.y += velocity.y * delta_time;
+  if (is_grounded)
+    current_jumps = 0;
+  std::cout << is_grounded << std::endl;
   apply_gravity(delta_time);
   sprite.setPosition(position);
   if (IsAttacking)
@@ -92,7 +103,16 @@ void Player::update(float delta_time) {
           attack_melee(*player_pair.second);
     }
 }
-void Player::draw(sf::RenderWindow &window) const { window.draw(sprite); }
+void Player::draw(sf::RenderWindow &window) const {
+  sf::Sprite sprite_to_draw = sprite;
+  sf::IntRect current_frame = sprite_to_draw.getTextureRect();
+  if (dir_x == -1.f) {
+    current_frame.position.x += current_frame.size.x;
+    current_frame.size.x *= -1;
+  }
+  sprite_to_draw.setTextureRect(current_frame);
+  window.draw(sprite_to_draw);
+}
 void Player::take_damage(float dir) {
   if (block_timer > 0 || dmg_timer > 0) {
     return;
