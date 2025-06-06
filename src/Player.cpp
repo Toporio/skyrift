@@ -210,9 +210,10 @@ void Player::take_damage(float dir) {
     return;
   }
   health++;
-  velocity.x = 5.f * (health)*dir;
-  velocity.y = -10.f * (health);
-  stun_timer = 0.05f * (health);
+  velocity.x = 10.f * (health)*dir;
+  dir_x = dir;
+  velocity.y = -20.f * (health);
+  stun_timer = 0.01f * (health);
   dmg_timer = Config::PLAYER_DMG_TIMER;
   status = PlayerStatus::HIT_STUN;
 }

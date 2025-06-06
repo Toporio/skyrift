@@ -12,7 +12,7 @@ class Player : public Entity {
 private:
   const float move_speed = Config::PLAYER_MOVE_SPEED;
   const float jump_speed = Config::PLAYER_JUMP_SPEED;
-  const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS;
+  const unsigned int max_jumps = Config::PLAYER_MAX_JUMPS - 1;
   unsigned int current_jumps = 0;
   float jump_cooldown_timer = 0;
   float stun_timer;
@@ -57,8 +57,8 @@ public:
   bool is_alive();
   void reset_player();
   void draw(sf::RenderWindow &window) const override;
-  void set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
-                     int frame_height, float delta_time, bool loop);
+  bool set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
+                     int frame_height, float animation_time, bool loop);
   // getters
   int get_player_id() const { return id; }
 };
