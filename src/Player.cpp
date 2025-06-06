@@ -47,9 +47,7 @@ void Player::block() {
 
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
-  sf::Vector2f projectile_position = {
-      sprite.getPosition().x + sprite.getTexture().getSize().x,
-      sprite.getPosition().y + sprite.getTexture().getSize().y};
+  sf::Vector2f projectile_position = {position.x, position.y};
   auto new_projectile_p = std::make_unique<Projectile>(
       id, stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
       projectile_position);
@@ -59,11 +57,11 @@ void Player::attack_ranged(
   std::cout << "atak range" << dir_x << std::endl;
 }
 void Player::attack_melee(Player &enemy) {
+  std::cout << "jebac" << std::endl;
   this->sprite.move(sf::Vector2f((this->dir_x > 0 ? 10.f : -10.f), 0.f));
   if (this->check_collision(enemy)) {
     enemy.take_damage(this->dir_x);
   }
-
   this->sprite.move(sf::Vector2f((this->dir_x > 0 ? -10.f : 10.f), 0.f));
 }
 void Player::update(float delta_time) {
@@ -78,7 +76,9 @@ void Player::update(float delta_time) {
   if (dmg_timer > 0)
     dmg_timer -= delta_time;
 
+  animation_timer += delta_time;
   PlayerStatus previous_status = status;
+
   switch (status) {
   case PlayerStatus::HIT_STUN: {
     if (stun_timer <= 0.f) {
@@ -86,33 +86,27 @@ void Player::update(float delta_time) {
     }
     break;
   }
-
   case PlayerStatus::ATTACKING_MELEE: {
-    const float ATTACK_ANIMATION = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
-    const int ATTACK_FRAMES = 6;
-    const float FRAME_DURATION = ATTACK_ANIMATION / ATTACK_FRAMES;
-    animation_timer += delta_time;
-    int frame = static_cast<int>(animation_timer / FRAME_DURATION);
-    if (frame >= ATTACK_FRAMES) {
-      frame = 0;
+    bool is_finished = set_animation(6, 230, 160, 30, 32, 0.6f, false);
+    if (is_finished) {
       status = is_grounded ? PlayerStatus::IDLE : PlayerStatus::FALLING;
-    }
-
-    std::cout << is_grounded << std::endl;
-    // sprite.setTexture(all_texxt);
-    sprite.setTextureRect(sf::IntRect({230 + frame * 32, 162}, {30, 28}));
-
-    for (auto &pair : stage_data.get_players()) {
-      if (pair.first != id) {
-        attack_melee(*pair.second);
+    } else {
+      for (auto &pair : stage_data.get_players()) {
+        if (pair.first != id) {
+          attack_melee(*pair.second);
+        }
       }
     }
     break;
   }
+
   case PlayerStatus::ATTACKING_RANGED: {
-    auto &projectiles = stage_data.get_projectiles();
-    attack_ranged(projectiles);
-    status = PlayerStatus::IDLE;
+    bool is_finished = set_animation(4, 230, 195, 30, 32, 0.6f, false);
+    if (is_finished) {
+      auto &projectiles = stage_data.get_projectiles();
+      attack_ranged(projectiles);
+      status = is_grounded ? PlayerStatus::IDLE : PlayerStatus::FALLING;
+    }
     break;
   }
   case PlayerStatus::BLOCKING: {
@@ -136,29 +130,47 @@ void Player::update(float delta_time) {
         status = PlayerStatus::FALLING;
       }
     }
+    if (status == PlayerStatus::RUNNING) {
+      set_animation(6, 0, 32, 32, 32, 0.6f, true);
+    } else if (status == PlayerStatus::IDLE) {
+      set_animation(4, 0, 162, 32, 30, 0.5f, true);
+    } else {
+      // TODO: zapierdol animacje skakania i spadania
+    }
+  }
     if (previous_status != status)
       animation_timer = 0.f;
-  }
   }
 
   apply_gravity(delta_time);
   position += velocity * delta_time;
   sprite.setPosition(position);
 }
-void Player::set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
-                           int frame_height, float delta_time,
-                           bool loop = false) {
-  const float ATTACK_ANIMATION = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
-  const int ATTACK_FRAMES = frame_num;
-  const float FRAME_DURATION = ATTACK_ANIMATION / ATTACK_FRAMES;
-  animation_timer += delta_time;
+
+bool Player::set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
+                           int frame_height, float animation_time, bool loop) {
+  frame_num--;
+  if (frame_num <= 0 || animation_time <= 0.f) {
+    sprite.setTextureRect(
+        sf::IntRect({x_pos, y_pos}, {frame_width, frame_height}));
+    return true;
+  }
+  const float FRAME_DURATION = animation_time / static_cast<float>(frame_num);
   int frame = static_cast<int>(animation_timer / FRAME_DURATION);
-  if (frame >= ATTACK_FRAMES) {
-    frame = loop ? 0 : ATTACK_FRAMES - 1;
+  bool animation_finished = false;
+  if (loop) {
+    frame &= frame_num;
+  } else {
+    if (frame >= frame_num) {
+      frame = frame_num - 1;
+      animation_finished = true;
+    }
   }
   sprite.setTextureRect(sf::IntRect({x_pos + frame * frame_width, y_pos},
                                     {frame_width, frame_height}));
+  return animation_finished;
 }
+
 void Player::draw(sf::RenderWindow &window) const {
   sf::Sprite sprite_to_draw = sprite;
   sf::IntRect current_frame = sprite_to_draw.getTextureRect();
@@ -180,6 +192,7 @@ void Player::take_damage(float dir) {
   dmg_timer = Config::PLAYER_DMG_TIMER;
   status = PlayerStatus::HIT_STUN;
 }
+
 bool Player::handle_input(const PlayerInputState &input_state,
                           float delta_time) {
   if (status == PlayerStatus::HIT_STUN) {
@@ -204,6 +217,7 @@ bool Player::handle_input(const PlayerInputState &input_state,
       (status == PlayerStatus::IDLE || status == PlayerStatus::RUNNING ||
        status == PlayerStatus::JUMPING || status == PlayerStatus::FALLING);
   if (input_state.attack_melee && can_act && attack_melee_cooldown <= 0) {
+
     status = PlayerStatus::ATTACKING_MELEE;
     attack_melee_cooldown = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
   }
