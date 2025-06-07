@@ -41,7 +41,7 @@ public:
 private:
   int new_player_id;
   void check_player_map_collision(Player &player, float delta_time);
-  void check_projectile_map_collision(Projectile &projectile);
+  void check_projectile_map_collision();
   void check_player_projectile_collision();
   void check_player_attack_collision();
   void check_player_out_of_map(Player &player);

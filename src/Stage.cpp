@@ -146,6 +146,7 @@ void Stage::update(float delta_time) {
   for (const auto &projectile : projectiles) {
     projectile->update(delta_time);
   }
+  check_projectile_map_collision();
   check_player_projectile_collision();
   projectiles.erase(
       std::remove_if(projectiles.begin(), projectiles.end(),
@@ -153,7 +154,7 @@ void Stage::update(float delta_time) {
                        if (!p_ptr) {
                          return true;
                        }
-                       return p_ptr->hp == 0 /* || p_ptr->is_expired() */;
+                       return p_ptr->hp <= 0 /* || p_ptr->is_expired() */;
                      }),
       projectiles.end());
 }
@@ -190,6 +191,15 @@ void Stage::check_player_projectile_collision() {
       if (player_p->check_collision(*projectile_p)) {
         player_p->take_damage(projectile_p->dir_x);
         projectile_p->hp--;
+      }
+    }
+  }
+}
+void Stage::check_projectile_map_collision() {
+  for (auto &projectile : projectiles) {
+    for (auto &tile : tiles) {
+      if (projectile->check_collision(*tile)) {
+        projectile->hp--;
       }
     }
   }

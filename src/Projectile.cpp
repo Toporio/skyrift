@@ -1,3 +1,4 @@
+#include "Entity.hpp"
 #include "Projectile.hpp"
 #include "common.hpp"
 #include "config.hpp"
@@ -16,7 +17,7 @@ void Projectile::update(float delta_time) {
   sprite.setPosition(position);
   if (position.x < 0 || position.x > Config::WINDOW_WIDTH || position.y < 0 ||
       position.y > Config::WINDOW_HEIGHT) {
-    hp = 0;
+    hp--;
   }
 }
 
@@ -27,6 +28,6 @@ EntityType Projectile::get_entity_type() const {
 }
 int Projectile::get_owner_id() const { return owner_id; }
 int Projectile::get_id() const { return id; }
-bool Projectile::check_collision(const Entity &other) const {
-  return check_collision(other);
-}
+// bool Projectile::check_collision(const Entity &other) const {
+// return Entity::check_collision(other);
+//}
