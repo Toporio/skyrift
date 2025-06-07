@@ -30,7 +30,7 @@ void ResourceManager::loadTexture(const std::string &name,
   textures[name] = texture;
 }
 Stage::Stage(const GameSettings &settings)
-    : game_settings(settings), game_map() {
+    : game_settings(settings), new_player_id(0) {
   try {
     resource_manager.loadTexture("jebac_kurwe_disa",
                                  Config::BLUE_PLAYER_SPRITES);
@@ -42,18 +42,27 @@ Stage::Stage(const GameSettings &settings)
   }
 }
 
-void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
+void Stage::add_player(const sf::Vector2f &spawn_position) {
   try {
     auto new_player_p = std::make_unique<Player>(
-        player_id, resource_manager.getTexture("jebac_kurwe_disa"),
+        new_player_id, resource_manager.getTexture("jebac_kurwe_disa"),
         spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives,
         *this, resource_manager.getTexture("all_sprites"));
     new_player_p->sprite.setScale({3.f, 3.f});
-    players.emplace(player_id, std::move(new_player_p));
+    players.emplace(new_player_id, std::move(new_player_p));
+    new_player_id++;
   } catch (const std::runtime_error &e) {
-    std::cerr << "Stage: Failed to add player " << player_id
+    std::cerr << "Stage: Failed to add player " << new_player_id
               << ". Reason: " << e.what() << std::endl;
   }
+}
+int Stage::get_new_projectile_id() {
+  int first_valid_id = 0;
+  for (auto &projectile : projectiles) {
+    if (first_valid_id == projectile->id)
+      first_valid_id++;
+  }
+  return first_valid_id;
 }
 
 void Stage::add_tiles(const sf::Vector2f &start_position) {
@@ -142,10 +151,8 @@ void Stage::update(float delta_time) {
       std::remove_if(projectiles.begin(), projectiles.end(),
                      [](const std::unique_ptr<Projectile> &p_ptr) {
                        if (!p_ptr) {
-                         return true; // Usuń puste wskaźniki (zabezpieczenie)
+                         return true;
                        }
-                       // Pocisk jest usuwany, jeśli jest oznaczony LUB jego
-                       // czas życia minął (is_expired)
                        return p_ptr->hp == 0 /* || p_ptr->is_expired() */;
                      }),
       projectiles.end());
@@ -169,7 +176,6 @@ void Stage::render(sf::RenderWindow &window) {
 void Stage::check_player_projectile_collision() {
   for (auto &player_pair : players) {
     std::unique_ptr<Player> &player_p = player_pair.second;
-
     if (!player_p) {
       continue;
     }
@@ -178,7 +184,7 @@ void Stage::check_player_projectile_collision() {
       if (!projectile_p) {
         continue;
       }
-      if (player_p->get_player_id() == projectile_p->get_id()) {
+      if (player_p->get_player_id() == projectile_p->get_owner_id()) {
         continue;
       }
       if (player_p->check_collision(*projectile_p)) {

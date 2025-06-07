@@ -11,10 +11,10 @@ Game::Game()
     : window(sf::RenderWindow(
           sf::VideoMode({Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT}),
           Config::WINDOW_TITLE)),
-      m_map(), stage({2, 2}) {
+      stage({2, 2}) {
   window.setFramerateLimit(Config::FPS_LIMIT);
-  stage.add_player(1, {350.f, 350.f});
-  stage.add_player(2, {450.f, 350.f});
+  stage.add_player({350.f, 350.f});
+  stage.add_player({450.f, 350.f});
   stage.add_tiles({300.f, 400.f});
   PlayerInputState input_state;
 };
@@ -23,7 +23,7 @@ void Game::run() {
   while (window.isOpen()) {
     sf::Time delta_time = clock.restart();
     handle_events();
-    stage.handle_player_input(1, input_state, delta_time.asSeconds());
+    stage.handle_player_input(0, input_state, delta_time.asSeconds());
     stage.update(delta_time.asSeconds());
     stage.render(window);
   }

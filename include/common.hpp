@@ -19,7 +19,7 @@ enum class PlayerStatus {
   DEAD
 };
 struct PlayerSnapshot {
-  int id;
+  int player_id;
   sf::Vector2f position;
   sf::Vector2f velocity;
   PlayerStatus status;
@@ -27,6 +27,12 @@ struct PlayerSnapshot {
   bool is_grounded;
   int lives;
   float health;
+};
+struct ProjectileSnapshot {
+  int projectile_id;
+  int owner_id;
+  sf::Vector2f position;
+  sf::Vector2f velocity;
 };
 struct PlayerInputState {
   bool move_left = false;

@@ -30,7 +30,6 @@ public:
          const sf::Texture &all_texture);
   int lives;
   bool is_grounded;
-  //  bool IsAttacking = 0;
   int dir_x;
   PlayerStatus status;
   float health;
@@ -51,7 +50,7 @@ public:
   void attack_melee(Player &enemy);
   void attack_ranged(std::vector<std::unique_ptr<Projectile>> &projectiles);
   void block();
-  // player interactionss
+
   void take_damage(float dir);
   void on_block_attack();
   bool is_alive();
@@ -59,6 +58,5 @@ public:
   void draw(sf::RenderWindow &window) const override;
   bool set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
                      int frame_height, float animation_time, bool loop);
-  // getters
   int get_player_id() const { return id; }
 };

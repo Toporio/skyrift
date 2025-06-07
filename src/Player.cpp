@@ -15,8 +15,8 @@ Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
       stage_data(stage_data), animation_timer(0.f),
       attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN),
       all_texxt(all_texture), basic_texture(texture) {
-    health = 0.f;
-    is_grounded = true;
+  health = 0.f;
+  is_grounded = true;
   attack_melee_cooldown = 0.f;
   block_cooldown_timer = 0.f;
   jump_cooldown_timer = 0.f;
@@ -48,11 +48,12 @@ void Player::block() {
 
 void Player::attack_ranged(
     std::vector<std::unique_ptr<Projectile>> &projectiles) {
-  sf::Vector2f projectile_position = {
-      sprite.getPosition().x,
-      sprite.getPosition().y + sprite.getTexture().getSize().y / 2.f};
+  int projectile_x_offset = dir_x * 16 + 16;
+  sf::Vector2f projectile_position = {position.x + projectile_x_offset,
+                                      position.y + 30};
   auto new_projectile_p = std::make_unique<Projectile>(
-      id, stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
+      stage_data.get_new_projectile_id(), id,
+      stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
       projectile_position);
   new_projectile_p->sprite.setScale({2.f, 2.f});
   projectiles.push_back(std::move(new_projectile_p));
@@ -63,14 +64,14 @@ void Player::attack_melee(Player &enemy) {
   std::cout << "jebac" << std::endl;
   this->sprite.move(sf::Vector2f((this->dir_x > 0 ? 10.f : -10.f), 0.f));
   if (this->check_collision(enemy)) {
-	  if (enemy.block_timer > 0) {
-		  std::cout << "jebac blok" << std::endl;
-          status = PlayerStatus::HIT_STUN;
-          stun_timer = 1.0f + 0.5f * health;
-          std::cout << stun_timer << std::endl;
-	  }
-      else
-        enemy.take_damage(this->dir_x);
+
+    if (enemy.block_timer > 0) {
+      std::cout << "jebac blok" << std::endl;
+      status = PlayerStatus::HIT_STUN;
+      stun_timer = 1.0f + 0.5f * health;
+      std::cout << stun_timer << std::endl;
+    } else
+      enemy.take_damage(this->dir_x);
   }
   this->sprite.move(sf::Vector2f((this->dir_x > 0 ? -10.f : 10.f), 0.f));
 }
@@ -86,15 +87,15 @@ void Player::update(float delta_time) {
   if (dmg_timer > 0)
     dmg_timer -= delta_time;
   if (stun_timer > 0)
-	  stun_timer -= delta_time;
+    stun_timer -= delta_time;
   if (block_timer > 0)
-	  block_timer -= delta_time;
-  if (velocity.x != 0)
-  {
-      if (Config::PLAYER_AIR_RESISTANCE > abs(velocity.x))
-          velocity.x = 0;
-      else
-          velocity.x += (dir_x > 0) ? -Config::PLAYER_AIR_RESISTANCE : Config::PLAYER_AIR_RESISTANCE;
+    block_timer -= delta_time;
+  if (velocity.x != 0) {
+    if (Config::PLAYER_AIR_RESISTANCE > abs(velocity.x))
+      velocity.x = 0;
+    else
+      velocity.x += (dir_x > 0) ? -Config::PLAYER_AIR_RESISTANCE
+                                : Config::PLAYER_AIR_RESISTANCE;
   }
 
   animation_timer += delta_time;
@@ -102,8 +103,7 @@ void Player::update(float delta_time) {
 
   switch (status) {
   case PlayerStatus::HIT_STUN: {
-    sprite.setTextureRect(sf::IntRect({ 288, 128 },
-          { 32, 32 }));
+    sprite.setTextureRect(sf::IntRect({288, 128}, {32, 32}));
     if (stun_timer <= 0.f) {
       status = PlayerStatus::IDLE;
     }
@@ -134,8 +134,7 @@ void Player::update(float delta_time) {
     break;
   }
   case PlayerStatus::BLOCKING: {
-    sprite.setTextureRect(sf::IntRect({ 256, 96 },
-          { 32, 32 }));
+    sprite.setTextureRect(sf::IntRect({256, 96}, {32, 32}));
     if (block_timer <= 0.f) {
       status = PlayerStatus::IDLE;
     }
@@ -244,23 +243,23 @@ bool Player::handle_input(const PlayerInputState &input_state,
       (status == PlayerStatus::IDLE || status == PlayerStatus::RUNNING ||
        status == PlayerStatus::JUMPING || status == PlayerStatus::FALLING);
   if (input_state.attack_melee && can_act && attack_melee_cooldown <= 0) {
-      animation_timer = 0.f;
+    animation_timer = 0.f;
     status = PlayerStatus::ATTACKING_MELEE;
     attack_melee_cooldown = Config::PLAYER_ATTACK_MELEE__COOLDOWN;
   }
   if (can_act && input_state.attack_ranged && attack_range_cooldown <= 0) {
-      animation_timer = 0.f;
-      status = PlayerStatus::ATTACKING_RANGED;
+    animation_timer = 0.f;
+    status = PlayerStatus::ATTACKING_RANGED;
     attack_range_cooldown = Config::PLAYER_ATTACK_RANGE__COOLDOWN;
   }
   if (input_state.jump) {
-      animation_timer = 0.f;
+    animation_timer = 0.f;
     jump();
   }
   if (input_state.block && block_timer <= 0) {
-      animation_timer = 0.f;
-      block();
-      status = PlayerStatus::BLOCKING;
+    animation_timer = 0.f;
+    block();
+    status = PlayerStatus::BLOCKING;
   }
   return lr;
 }
