@@ -15,7 +15,8 @@ Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
       stage_data(stage_data), animation_timer(0.f),
       attack_range_cooldown(Config::PLAYER_ATTACK_RANGE__COOLDOWN),
       all_texxt(all_texture), basic_texture(texture) {
-
+    health = 0.f;
+    is_grounded = true;
   attack_melee_cooldown = 0.f;
   block_cooldown_timer = 0.f;
   jump_cooldown_timer = 0.f;
@@ -65,7 +66,8 @@ void Player::attack_melee(Player &enemy) {
 	  if (enemy.block_timer > 0) {
 		  std::cout << "jebac blok" << std::endl;
           status = PlayerStatus::HIT_STUN;
-		  stun_timer = 0.05f * (health);
+          stun_timer = 1.0f + 0.5f * health;
+          std::cout << stun_timer << std::endl;
 	  }
       else
         enemy.take_damage(this->dir_x);
