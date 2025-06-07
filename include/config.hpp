@@ -21,7 +21,7 @@ const float PLAYER_JUMP_COOLDOWN = 0.5f;
 const unsigned int PLAYER_MAX_JUMPS = 3;
 
 const float PLAYER_TIMEOUT = 1.f;
-
+const int SERVER_PORT = 7777;
 const std::string TERRAIN_SPRITE = "../assets/terrain.png";
 const std::string BLUE_PLAYER_SPRITES =
     "../assets/Pink_Monster/Pink_Monster.png";
