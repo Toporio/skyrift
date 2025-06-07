@@ -263,3 +263,7 @@ bool Player::handle_input(const PlayerInputState &input_state,
   }
   return lr;
 }
+
+PlayerSnapshot Player::get_player_snapshot() const {
+  return {id, position, velocity, status, dir_x, is_grounded, lives, health};
+}

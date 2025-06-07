@@ -23,7 +23,7 @@ struct PlayerSnapshot {
   sf::Vector2f position;
   sf::Vector2f velocity;
   PlayerStatus status;
-  float dir_x;
+  int dir_x;
   bool is_grounded;
   int lives;
   float health;
@@ -33,6 +33,12 @@ struct ProjectileSnapshot {
   int owner_id;
   sf::Vector2f position;
   sf::Vector2f velocity;
+};
+struct StageSnapshot {
+  int game_tick;
+  std::vector<PlayerSnapshot> players;
+  std::vector<ProjectileSnapshot> projectiles;
+  // other info about current game state
 };
 struct PlayerInputState {
   bool move_left = false;

@@ -31,3 +31,6 @@ int Projectile::get_id() const { return id; }
 // bool Projectile::check_collision(const Entity &other) const {
 // return Entity::check_collision(other);
 //}
+ProjectileSnapshot Projectile::get_projectile_snapshot() const {
+  return {id, owner_id, position, velocity};
+}

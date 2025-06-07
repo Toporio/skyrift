@@ -32,6 +32,7 @@ public:
   void draw(sf::RenderWindow &window);
   void reset_game();
   int get_new_projectile_id();
+  StageSnapshot get_stage_snapshot() const;
   ResourceManager &get_resource_manager() { return resource_manager; }
   std::map<int, std::unique_ptr<Player>> &get_players() { return players; };
   std::vector<std::unique_ptr<Projectile>> &get_projectiles() {

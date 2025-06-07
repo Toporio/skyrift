@@ -2,6 +2,7 @@
 #include "Map.hpp"
 #include "Player.hpp"
 #include "Stage.hpp"
+#include "common.hpp"
 #include "config.hpp"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -248,4 +249,17 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
       }
     }
   }
+}
+StageSnapshot Stage::get_stage_snapshot() const {
+  StageSnapshot current_stage_snapshot;
+  current_stage_snapshot.game_tick++;
+  for (auto &pair : players) {
+    current_stage_snapshot.players.push_back(
+        pair.second->get_player_snapshot());
+  }
+  for (auto &projectile : projectiles) {
+    current_stage_snapshot.projectiles.push_back(
+        projectile->get_projectile_snapshot());
+  }
+  return current_stage_snapshot;
 }
