@@ -13,6 +13,7 @@ public:
   void draw(sf::RenderWindow &window) const override;
   EntityType get_entity_type() const override;
   ProjectileSnapshot get_projectile_snapshot() const;
+  void apply_snapshot(const ProjectileSnapshot &snapshot);
   // bool check_collision(const Entity &other) const override;
   int owner_id;
   int get_owner_id() const;

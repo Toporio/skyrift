@@ -40,6 +40,7 @@ public:
   bool handle_input(const PlayerInputState &input_state, float delta_time);
   void update(float delta_time) override;
   PlayerSnapshot get_player_snapshot() const;
+  void apply_snapshot(const PlayerSnapshot &snapshot);
   EntityType get_entity_type() const override { return EntityType::PLAYER; };
 
   // player movement

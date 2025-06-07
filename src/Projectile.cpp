@@ -34,3 +34,9 @@ int Projectile::get_id() const { return id; }
 ProjectileSnapshot Projectile::get_projectile_snapshot() const {
   return {id, owner_id, position, velocity};
 }
+void Projectile::apply_snapshot(const ProjectileSnapshot &snapshot) {
+  id = snapshot.projectile_id;
+  owner_id = snapshot.owner_id;
+  position = snapshot.position;
+  velocity = snapshot.velocity;
+}

@@ -13,8 +13,8 @@ Game::Game()
           Config::WINDOW_TITLE)),
       stage({2, 2}) {
   window.setFramerateLimit(Config::FPS_LIMIT);
-  stage.add_player({350.f, 350.f});
-  stage.add_player({450.f, 350.f});
+  stage.add_player(1, {350.f, 350.f});
+  stage.add_player(2, {450.f, 350.f});
   stage.add_tiles({300.f, 400.f});
   PlayerInputState input_state;
 };

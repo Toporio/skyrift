@@ -267,3 +267,11 @@ bool Player::handle_input(const PlayerInputState &input_state,
 PlayerSnapshot Player::get_player_snapshot() const {
   return {id, position, velocity, status, dir_x, is_grounded, lives, health};
 }
+void Player::apply_snapshot(const PlayerSnapshot &snapshot) {
+  position = snapshot.position;
+  velocity = snapshot.velocity;
+  dir_x = snapshot.dir_x;
+  is_grounded = snapshot.is_grounded;
+  lives = snapshot.lives;
+  health = snapshot.health;
+}

@@ -1,5 +1,5 @@
 #pragma once
-#include "Map.hpp"
+
 #include "Player.hpp"
 #include "Stage.hpp"
 #include "common.hpp"
@@ -43,15 +43,15 @@ Stage::Stage(const GameSettings &settings)
   }
 }
 
-void Stage::add_player(const sf::Vector2f &spawn_position) {
+void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
   try {
     auto new_player_p = std::make_unique<Player>(
-        new_player_id, resource_manager.getTexture("jebac_kurwe_disa"),
+        player_id, resource_manager.getTexture("jebac_kurwe_disa"),
         spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives,
         *this, resource_manager.getTexture("all_sprites"));
     new_player_p->sprite.setScale({3.f, 3.f});
-    players.emplace(new_player_id, std::move(new_player_p));
-    new_player_id++;
+    players.emplace(player_id, std::move(new_player_p));
+
   } catch (const std::runtime_error &e) {
     std::cerr << "Stage: Failed to add player " << new_player_id
               << ". Reason: " << e.what() << std::endl;
@@ -252,7 +252,7 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
 }
 StageSnapshot Stage::get_stage_snapshot() const {
   StageSnapshot current_stage_snapshot;
-  current_stage_snapshot.game_tick++;
+  current_stage_snapshot.game_tick = 1;
   for (auto &pair : players) {
     current_stage_snapshot.players.push_back(
         pair.second->get_player_snapshot());
@@ -262,4 +262,20 @@ StageSnapshot Stage::get_stage_snapshot() const {
         projectile->get_projectile_snapshot());
   }
   return current_stage_snapshot;
+}
+void Stage::apply_stage_snapshot(const StageSnapshot &snapshot) {
+  for (auto player_snapshot : snapshot.players) {
+    for (auto &pair : players) {
+      if (pair.first == player_snapshot.player_id) {
+        pair.second->apply_snapshot(player_snapshot);
+      }
+    }
+  }
+  for (auto projectile_snapshot : snapshot.projectiles) {
+    for (auto &projectile : projectiles) {
+      if (projectile->id == projectile_snapshot.projectile_id) {
+        projectile->apply_snapshot(projectile_snapshot);
+      }
+    }
+  }
 }

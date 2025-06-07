@@ -22,7 +22,7 @@ class Stage {
 public:
   Stage(const GameSettings &settings);
   void add_tiles(const sf::Vector2f &start_position);
-  void add_player(const sf::Vector2f &spawn_position);
+  void add_player(int player_id, const sf::Vector2f &spawn_position);
   void remove_player(int player_id);
 
   void handle_player_input(int player_id, const PlayerInputState &input,
@@ -33,6 +33,7 @@ public:
   void reset_game();
   int get_new_projectile_id();
   StageSnapshot get_stage_snapshot() const;
+  void apply_stage_snapshot(const StageSnapshot &snapshot);
   ResourceManager &get_resource_manager() { return resource_manager; }
   std::map<int, std::unique_ptr<Player>> &get_players() { return players; };
   std::vector<std::unique_ptr<Projectile>> &get_projectiles() {
