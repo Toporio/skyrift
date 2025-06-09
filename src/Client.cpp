@@ -7,6 +7,7 @@
 #include <SFML/Network/IpAddress.hpp>
 #include <SFML/Network/Packet.hpp>
 #include <SFML/Network/Socket.hpp>
+#include <SFML/Network/UdpSocket.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
@@ -14,7 +15,8 @@ Client::Client()
     : window(sf::RenderWindow(
           sf::VideoMode({Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT}),
           Config::WINDOW_TITLE)),
-      game_settings{}, stage({game_settings}), socket(), server_address(0) {
+      game_settings{}, stage({game_settings}), server_address(0) {
+
   if (socket.bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
     std::cout << "Failed to bind socket to port." << std::endl;
   } else {
@@ -31,6 +33,7 @@ bool Client::connect(const sf::IpAddress &server_ip,
   player_name = player_name_;
   sf::Packet request_packet;
   request_packet << "JEBAC DISA";
+
   if (socket.send(request_packet, server_address, server_port) !=
       sf::Socket::Status::Done) {
     std::cout << "Failed to send connection request" << std::endl;
@@ -46,33 +49,48 @@ bool Client::connect(const sf::IpAddress &server_ip,
     socket.setBlocking(false);
     return false;
   }
+
   socket.setBlocking(false);
   if (first_packet >> player_id >> last_stage_snapshot) {
     is_connected = true;
-    std::cout << "connected successfully" << std::endl;
-    stage.apply_stage_snapshot(last_stage_snapshot);
+    stage.apply_stage_snapshot(last_stage_snapshot, sf::Time::Zero, player_id);
+    //  std::cout << stage.get_players().size() << std::endl;
     return true;
   }
   return false;
 }
+
 void Client::run() {
   if (!is_connected) {
     std::cout << "not connected to a server" << std::endl;
+  } else {
+    std::cout << " connected to a server" << std::endl;
   }
+  const sf::Time INTERPOLATION_DELAY = sf::milliseconds(50);
   clock.restart();
+  socket.setBlocking(false);
   while (window.isOpen()) {
     sf::Time delta_time = clock.restart();
     get_input();
-    send_input();
-    time_since_last_input_sent += delta_time;
+    for (auto &pair : stage.get_players()) {
+      if (pair.first == player_id) {
+        pair.second->handle_input(input_state, delta_time.asSeconds());
+        pair.second->update(delta_time.asSeconds());
+      }
+    }
+    // stage.handle_player_input(player_id, input_state,
+    // delta_time.asSeconds());
+    //  stage.update(delta_time.asSeconds());
+    send_input(delta_time);
+
     receive_snapshot();
-    stage.apply_stage_snapshot(last_stage_snapshot);
-    stage.update(delta_time.asSeconds());
+    // stage.apply_stage_snapshot(last_stage_snapshot, clock.getElapsedTime());
+    sf::Time render_time = clock.getElapsedTime() - INTERPOLATION_DELAY;
+    stage.update_interpolation(render_time, player_id);
     stage.render(window);
   }
 }
 void Client::get_input() {
-
   while (const std::optional event = window.pollEvent()) {
     if (event->is<sf::Event::Closed>()) {
       window.close();
@@ -86,10 +104,11 @@ void Client::get_input() {
     input_state.block = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L);
   }
 }
-void Client::send_input() {
-  sf::Packet input_packet;
-  input_packet << input_state;
+void Client::send_input(sf::Time delta_time) {
+  time_since_last_input_sent += delta_time;
   if (time_since_last_input_sent >= input_send_interval) {
+    sf::Packet input_packet;
+    input_packet << input_state;
     socket.send(input_packet, server_address, server_port);
     time_since_last_input_sent -= input_send_interval;
   }
@@ -100,8 +119,11 @@ void Client::receive_snapshot() {
   unsigned short server_port;
   while (socket.receive(new_stage_packet, server_ip, server_port) ==
          sf::Socket::Status::Done) {
-    if (server_ip) {
-      new_stage_packet >> last_stage_snapshot;
+    if (server_ip && *server_ip == server_address) {
+      StageSnapshot snapshot;
+      if (new_stage_packet >> snapshot) {
+        stage.apply_stage_snapshot(snapshot, clock.getElapsedTime(), player_id);
+      }
     }
   }
 }

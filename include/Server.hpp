@@ -36,5 +36,6 @@ private:
   std::map<int, ConnectedClient> clients;
   std::map<std::string, int> players_by_address;
   sf::Clock clock;
+  int game_tick = 0;
   const sf::Time broadcast_interval = sf::seconds(1.f / 20.f);
 };

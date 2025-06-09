@@ -10,6 +10,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
+#include <set>
 
 sf::Texture &ResourceManager::getTexture(const std::string &name) {
   try {
@@ -41,6 +42,7 @@ Stage::Stage(const GameSettings &settings)
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
+  add_tiles({300.f, 400.f});
 }
 
 void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
@@ -96,7 +98,17 @@ void Stage::add_tiles(const sf::Vector2f &start_position) {
     tiles.push_back(std::move(tile));
   }
 }
-
+void Stage::update_interpolation(sf::Time timestamp, int client_id) {
+  for (auto &pair : players) {
+    if (pair.second && pair.first != client_id) {
+      pair.second->update_interpolation(timestamp);
+    }
+  }
+  for (auto &projectile : projectiles) {
+    if (projectile)
+      projectile->update_interpolation(timestamp);
+  }
+}
 void Stage::handle_player_input(int player_id, const PlayerInputState &input,
                                 float delta_time) {
   for (const auto &pair : players) {
@@ -252,7 +264,7 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
 }
 StageSnapshot Stage::get_stage_snapshot() const {
   StageSnapshot current_stage_snapshot;
-  current_stage_snapshot.game_tick = 1;
+  current_stage_snapshot.game_tick = 0;
   for (auto &pair : players) {
     current_stage_snapshot.players.push_back(
         pair.second->get_player_snapshot());
@@ -263,19 +275,76 @@ StageSnapshot Stage::get_stage_snapshot() const {
   }
   return current_stage_snapshot;
 }
-void Stage::apply_stage_snapshot(const StageSnapshot &snapshot) {
+void Stage::apply_stage_snapshot(const StageSnapshot &snapshot,
+                                 sf::Time timestamp, int player_id) {
+  std::set<int> players_in_snapshot;
   for (auto player_snapshot : snapshot.players) {
-    for (auto &pair : players) {
-      if (pair.first == player_snapshot.player_id) {
-        pair.second->apply_snapshot(player_snapshot);
+    players_in_snapshot.insert(player_snapshot.player_id);
+    auto it = players.find(player_snapshot.player_id);
+    if (it != players.end() && it->second) {
+      if (player_id == it->first) {
+        it->second->position = player_snapshot.position;
+        it->second->velocity = player_snapshot.velocity;
+        it->second->status = player_snapshot.status;
+        it->second->is_grounded = player_snapshot.is_grounded;
+        it->second->dir_x = player_snapshot.dir_x;
+        it->second->health = player_snapshot.health;
+        it->second->lives = player_snapshot.lives;
+      } else
+        it->second->add_snapshot(player_snapshot, timestamp);
+    }
+  }
+
+  std::vector<int> players_to_remove;
+  for (const auto &pair : players) {
+    if (players_in_snapshot.find(pair.first) == players_in_snapshot.end()) {
+      players_to_remove.push_back(pair.first);
+    }
+  }
+  for (int id : players_to_remove)
+    remove_player(id);
+
+  for (auto &player_snapshot : snapshot.players) {
+    if (players.find(player_snapshot.player_id) == players.end()) {
+      add_player(player_snapshot.player_id, player_snapshot.position);
+      if (players.count(player_snapshot.player_id)) {
+        players.at(player_snapshot.player_id)
+            ->add_snapshot(player_snapshot, timestamp);
       }
     }
   }
-  for (auto projectile_snapshot : snapshot.projectiles) {
+  std::set<int> projectiles_in_snapshot;
+  for (const auto &projectile_snapshot : snapshot.projectiles) {
+    projectiles_in_snapshot.insert(projectile_snapshot.projectile_id);
+    bool old_projectile = false;
     for (auto &projectile : projectiles) {
-      if (projectile->id == projectile_snapshot.projectile_id) {
-        projectile->apply_snapshot(projectile_snapshot);
+      if (projectile && projectile->id == projectile_snapshot.projectile_id) {
+        projectile->add_snapshot(projectile_snapshot, timestamp);
+        old_projectile = true;
       }
     }
+    if (!old_projectile)
+      add_projectile_from_snapshot(projectile_snapshot);
   }
+  projectiles.erase(
+      std::remove_if(projectiles.begin(), projectiles.end(),
+                     [&](const std::unique_ptr<Projectile> &p_ptr) {
+                       if (!p_ptr)
+                         return true;
+                       return projectiles_in_snapshot.find(p_ptr->id) ==
+                              projectiles_in_snapshot.end();
+                     }),
+      projectiles.end());
 }
+void Stage::add_projectile_from_snapshot(const ProjectileSnapshot &snapshot) {
+  sf::Texture &projectile_texture =
+      resource_manager.getTexture("pocisk_w_orka");
+  const float damage = Config::PROJECTILE_DAMAGE;
+  float dir_x = snapshot.velocity.x > 0 ? 1.f : -1.f;
+  const float lifes = 1;
+  auto new_projectile = std::make_unique<Projectile>(
+      snapshot.projectile_id, snapshot.owner_id, projectile_texture, dir_x,
+      snapshot.position);
+  projectiles.push_back(std::move(new_projectile));
+}
+void Stage::remove_player(int player_id) { players.erase(player_id); }

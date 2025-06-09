@@ -8,6 +8,10 @@
 
 class Projectile;
 class Stage;
+struct TimedPlayerSnapshot {
+  sf::Time timestamp;
+  PlayerSnapshot data;
+};
 class Player : public Entity {
 private:
   const float move_speed = Config::PLAYER_MOVE_SPEED;
@@ -23,6 +27,7 @@ private:
   float dmg_timer;
   float animation_timer;
   Stage &stage_data;
+  std::deque<TimedPlayerSnapshot> snapshot_buffer;
 
 public:
   Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
@@ -33,6 +38,9 @@ public:
   int dir_x;
   PlayerStatus status;
   float health;
+
+  void add_snapshot(const PlayerSnapshot &snapshot, sf::Time timestamp);
+  void update_interpolation(sf::Time render_timestamp);
 
   sf::Texture all_texxt;
   sf::Texture basic_texture;

@@ -12,13 +12,13 @@ public:
   bool connect(const sf::IpAddress &server_ip, unsigned short server_port_,
                const std::string &player_name_ = "Player");
   void run(sf::RenderWindow &window);
+  void run();
 
 private:
   void receive_snapshot();
-  void send_input();
+  void send_input(sf::Time delta_time);
   void get_input();
 
-  void run();
   void update_local_stage(float delta_time);
   void render(sf::RenderWindow &window);
 

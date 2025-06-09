@@ -16,8 +16,16 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-file(GLOB_RECURSE PROJECT_SOURCES
-    "src/*.cpp"
+set( PROJECT_SOURCES
+    src/main.cpp
+        src/Game.cpp
+        src/Stage.cpp
+        src/Player.cpp
+        src/Projectile.cpp
+        src/Tile.cpp
+        src/Entity.cpp
+        src/Server.cpp
+        src/Client.cpp
 )
 
 add_executable(skyrift ${PROJECT_SOURCES})

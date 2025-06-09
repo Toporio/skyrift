@@ -33,7 +33,10 @@ public:
   void reset_game();
   int get_new_projectile_id();
   StageSnapshot get_stage_snapshot() const;
-  void apply_stage_snapshot(const StageSnapshot &snapshot);
+  void update_interpolation(sf::Time timestamp, int client_id);
+  void add_projectile_from_snapshot(const ProjectileSnapshot &snapshot);
+  void apply_stage_snapshot(const StageSnapshot &snapshot, sf::Time timestamp,
+                            int player_id);
   ResourceManager &get_resource_manager() { return resource_manager; }
   std::map<int, std::unique_ptr<Player>> &get_players() { return players; };
   std::vector<std::unique_ptr<Projectile>> &get_projectiles() {
