@@ -5,6 +5,8 @@
 #include "common.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <map>
 #include <memory>
 #include <vector>
@@ -45,10 +47,12 @@ public:
 
 private:
   int new_player_id;
+  sf::Texture background_tex;
   void check_player_map_collision(Player &player, float delta_time);
   void check_projectile_map_collision();
   void check_player_projectile_collision();
   void check_player_attack_collision();
+  void draw_background(sf::RenderWindow &window);
   void check_player_out_of_map(Player &player);
   GameSettings game_settings;
 

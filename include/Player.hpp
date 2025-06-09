@@ -41,6 +41,7 @@ public:
 
   void add_snapshot(const PlayerSnapshot &snapshot, sf::Time timestamp);
   void update_interpolation(sf::Time render_timestamp);
+  void update_animation(float delta_time);
 
   sf::Texture all_texxt;
   sf::Texture basic_texture;

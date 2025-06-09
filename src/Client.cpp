@@ -78,6 +78,7 @@ void Client::run() {
         pair.second->update(delta_time.asSeconds());
       }
     }
+
     // stage.handle_player_input(player_id, input_state,
     // delta_time.asSeconds());
     //  stage.update(delta_time.asSeconds());
@@ -87,6 +88,11 @@ void Client::run() {
     // stage.apply_stage_snapshot(last_stage_snapshot, clock.getElapsedTime());
     sf::Time render_time = clock.getElapsedTime() - INTERPOLATION_DELAY;
     stage.update_interpolation(render_time, player_id);
+    for (auto &pair : stage.get_players()) {
+      if (pair.first != player_id) {
+        pair.second->update_animation(delta_time.asSeconds());
+      }
+    }
     stage.render(window);
   }
 }

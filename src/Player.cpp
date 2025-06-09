@@ -176,6 +176,51 @@ void Player::update(float delta_time) {
   sprite.setPosition(position);
 }
 
+void Player::update_animation(float delta_time) {
+  animation_timer += delta_time;
+  PlayerStatus previous_status = status;
+  switch (status) {
+  case PlayerStatus::HIT_STUN: {
+    sprite.setTextureRect(sf::IntRect({288, 128}, {32, 32}));
+    break;
+  }
+  case PlayerStatus::ATTACKING_MELEE: {
+    bool is_finished = set_animation(6, 230, 160, 30, 32, 0.6f, false);
+    if (is_finished) {
+      animation_timer = 0.f;
+    }
+    break;
+  }
+
+  case PlayerStatus::ATTACKING_RANGED: {
+    bool is_finished = set_animation(4, 230, 195, 30, 32, 0.6f, false);
+    if (is_finished) {
+      animation_timer = 0.f;
+    }
+    break;
+  }
+  case PlayerStatus::BLOCKING: {
+    sprite.setTextureRect(sf::IntRect({256, 96}, {32, 32}));
+    break;
+  }
+  default: {
+    if (status == PlayerStatus::RUNNING) {
+      set_animation(6, 0, 32, 32, 32, 0.6f, true);
+    } else if (status == PlayerStatus::IDLE) {
+      set_animation(4, 0, 162, 32, 30, 0.5f, true);
+    } else {
+      // TODO: zapierdol animacje skakania i spadania
+    }
+  }
+    if (previous_status != status)
+      animation_timer = 0.f;
+  }
+
+  apply_gravity(delta_time);
+  position += velocity * delta_time;
+  sprite.setPosition(position);
+}
+
 bool Player::set_animation(int frame_num, int x_pos, int y_pos, int frame_width,
                            int frame_height, float animation_time, bool loop) {
   frame_num--;
@@ -225,7 +270,7 @@ void Player::update_interpolation(sf::Time timestamp) {
     } else {
       to = &snapshot;
       break;
-    }
+    };
   }
   if (!from || !to) {
     std::cout << "znowu guwno" << std::endl;

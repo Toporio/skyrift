@@ -7,6 +7,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
@@ -39,10 +40,14 @@ Stage::Stage(const GameSettings &settings)
     resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
     resource_manager.loadTexture("orka_zwisa", Config::TERRAIN_SPRITE);
     resource_manager.loadTexture("all_sprites", Config::PINK_PLAYER_SPRITES);
+    resource_manager.loadTexture("background_texturka", Config::BACKGROUND_TEX);
+
   } catch (const std::runtime_error &e) {
     std::cerr << "loading texture error" << e.what() << std::endl;
   }
   add_tiles({300.f, 400.f});
+
+  // background_sprite.setTexture(resource_manager.getTexture("background_texturka"));
 }
 
 void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
@@ -171,7 +176,18 @@ void Stage::update(float delta_time) {
                      }),
       projectiles.end());
 }
+void Stage::draw_background(sf::RenderWindow &window) {
+  sf::Texture back_tex = resource_manager.getTexture("background_texturka");
+  sf::Sprite background(back_tex);
+  sf::Vector2u textureSize = back_tex.getSize();
+  float scaleX = static_cast<float>(Config::WINDOW_WIDTH) / textureSize.x;
+  float scaleY = static_cast<float>(Config::WINDOW_HEIGHT) / textureSize.y;
+  background.setScale({scaleX, scaleY});
+  window.draw(background);
+}
 void Stage::draw(sf::RenderWindow &window) {
+  sf::Sprite background(resource_manager.getTexture("background_texturka"));
+  draw_background(window);
   for (const auto &tile : tiles) {
     tile->draw(window);
   }
@@ -183,7 +199,7 @@ void Stage::draw(sf::RenderWindow &window) {
   }
 }
 void Stage::render(sf::RenderWindow &window) {
-  window.clear(sf::Color::Yellow);
+  window.clear();
   draw(window);
   window.display();
 }
@@ -219,9 +235,10 @@ void Stage::check_projectile_map_collision() {
 }
 void Stage::check_player_map_collision(Player &player, float delta_time) {
   sf::FloatRect player_bounds = player.sprite.getGlobalBounds();
+  // player_bounds.position.x = player.position.x + 3;
+  //  player_bounds.position.y = player.position.y;
+  // player_bounds.size.x = 30;
   player.is_grounded = false;
-  //  player_bounds.size.x -= 40;
-  // player_bounds.position.x += 20;
   for (const auto &tile_p : tiles) {
     if (!tile_p) {
       continue;
@@ -243,15 +260,19 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
       if (penetration_x < penetration_y) {
         if (overlap_left < overlap_right) {
           player.position.x -= penetration_x;
+          // player.velocity.x = player.velocity.x < 0 ? 0.f :
+          // player.velocity.x;
         } else {
           player.position.x += penetration_x;
+          // player.velocity.x = player.velocity.x > 0 ? 0.f :
+          // player.velocity.x;
         }
 
         player.velocity.x = 0.f;
       } else {
         if (overlap_top < overlap_bottom) {
           player.position.y -= penetration_y;
-          player.velocity.y = 0.f;
+          player.velocity.y = player.velocity.y > 0 ? 0.f : player.velocity.y;
           player.is_grounded = true;
         } else {
           player.position.y += penetration_y;
