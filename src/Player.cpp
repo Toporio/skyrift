@@ -45,7 +45,6 @@ void Player::apply_gravity(float delta_time) {
 void Player::move(float direction) { velocity.x = direction * move_speed; }
 
 void Player::block() {
-  std::cout << "block dmg" << std::endl;
   block_cooldown_timer = Config::PLAYER_BLOCK_COOLDOWN;
   block_timer = Config::PLAYER_BLOCK_TIMER;
 }
@@ -57,23 +56,18 @@ void Player::attack_ranged(
                                       position.y + 30};
   auto new_projectile_p = std::make_unique<Projectile>(
       stage_data.get_new_projectile_id(), id,
-      stage_data.get_resource_manager().getTexture("pocisk_w_orka"), dir_x,
+      stage_data.get_resource_manager().getTexture("projectile_tex"), dir_x,
       projectile_position);
-  new_projectile_p->sprite.setScale({2.f, 2.f});
   projectiles.push_back(std::move(new_projectile_p));
   attack_range_cooldown = Config::PLAYER_ATTACK_RANGE__COOLDOWN;
-  std::cout << "atak range" << dir_x << std::endl;
 }
 void Player::attack_melee(Player &enemy) {
-  std::cout << "jebac" << std::endl;
   this->sprite.move(sf::Vector2f((this->dir_x > 0 ? 10.f : -10.f), 0.f));
   if (this->check_collision(enemy)) {
 
     if (enemy.block_timer > 0) {
-      std::cout << "jebac blok" << std::endl;
       status = PlayerStatus::HIT_STUN;
       stun_timer = 1.0f + 0.5f * health;
-      std::cout << stun_timer << std::endl;
     } else
       enemy.take_damage(this->dir_x);
   }
@@ -164,7 +158,7 @@ void Player::update(float delta_time) {
     } else if (status == PlayerStatus::IDLE) {
       set_animation(4, 0, 162, 32, 30, 0.5f, true);
     } else {
-      // TODO: zapierdol animacje skakania i spadania
+      // TODO: animacje skakania i spadania
     }
   }
     if (previous_status != status)
@@ -253,7 +247,6 @@ void Player::add_snapshot(const PlayerSnapshot &snapshot, sf::Time timestamp) {
 }
 
 void Player::update_interpolation(sf::Time timestamp) {
-
   if (snapshot_buffer.size() < 2) {
     if (!snapshot_buffer.empty()) {
       sprite.setPosition(snapshot_buffer.back().data.position);
@@ -263,8 +256,7 @@ void Player::update_interpolation(sf::Time timestamp) {
   TimedPlayerSnapshot *from = nullptr;
   TimedPlayerSnapshot *to = nullptr;
   for (auto &snapshot : snapshot_buffer) {
-    std::cout << "min: " << snapshot.timestamp.asMilliseconds()
-              << "   timestamp: " << timestamp.asMilliseconds() << std::endl;
+
     if (snapshot.timestamp <= timestamp) {
       from = &snapshot;
     } else {
@@ -273,7 +265,6 @@ void Player::update_interpolation(sf::Time timestamp) {
     };
   }
   if (!from || !to) {
-    std::cout << "znowu guwno" << std::endl;
     sprite.setPosition(snapshot_buffer.back().data.position);
     position = snapshot_buffer.back().data.position;
     velocity = snapshot_buffer.back().data.velocity;

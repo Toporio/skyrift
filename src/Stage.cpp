@@ -35,10 +35,9 @@ void ResourceManager::loadTexture(const std::string &name,
 Stage::Stage(const GameSettings &settings)
     : game_settings(settings), new_player_id(0) {
   try {
-    resource_manager.loadTexture("jebac_kurwe_disa",
-                                 Config::BLUE_PLAYER_SPRITES);
-    resource_manager.loadTexture("pocisk_w_orka", Config::PROJECTILE_SPRITE);
-    resource_manager.loadTexture("orka_zwisa", Config::TERRAIN_SPRITE);
+    resource_manager.loadTexture("blue_player", Config::BLUE_PLAYER_SPRITES);
+    resource_manager.loadTexture("projectile_tex", Config::PROJECTILE_SPRITE);
+    resource_manager.loadTexture("terrain_tex", Config::TERRAIN_SPRITE);
     resource_manager.loadTexture("all_sprites", Config::PINK_PLAYER_SPRITES);
     resource_manager.loadTexture("background_texturka", Config::BACKGROUND_TEX);
 
@@ -53,9 +52,9 @@ Stage::Stage(const GameSettings &settings)
 void Stage::add_player(int player_id, const sf::Vector2f &spawn_position) {
   try {
     auto new_player_p = std::make_unique<Player>(
-        player_id, resource_manager.getTexture("jebac_kurwe_disa"),
-        spawn_position, sf::Vector2f(0.f, 0.f), game_settings.player_lives,
-        *this, resource_manager.getTexture("all_sprites"));
+        player_id, resource_manager.getTexture("all_sprites"), spawn_position,
+        sf::Vector2f(0.f, 0.f), game_settings.player_lives, *this,
+        resource_manager.getTexture("all_sprites"));
     new_player_p->sprite.setScale({3.f, 3.f});
     players.emplace(player_id, std::move(new_player_p));
 
@@ -94,12 +93,12 @@ void Stage::add_tiles(const sf::Vector2f &start_position) {
     }
     sf::Vector2f pos = start_position + sf::Vector2f(x_offset, y_offset);
     auto tile =
-        std::make_unique<Tile>(i, resource_manager.getTexture("orka_zwisa"),
+        std::make_unique<Tile>(i, resource_manager.getTexture("terrain_tex"),
                                pos, sf::Vector2f(0.0f, 0.0f));
     tile->sprite.setTextureRect(temp);
     tile->sprite.setScale(scale);
     x_offset += temp.size.x * scale.x;
-    std::cout << tile->sprite.getPosition().x << std::endl;
+
     tiles.push_back(std::move(tile));
   }
 }
@@ -144,7 +143,7 @@ void Stage::check_player_out_of_map(Player &player) {
   auto y_side = player.sprite.getGlobalBounds().getCenter().y;
   if (x_side < -500 || x_side > Config::WINDOW_WIDTH + 500 ||
       y_side > Config::WINDOW_HEIGHT + 500) {
-    std::cout << x_side << y_side;
+
     player.position.x = 400.0f;
     player.position.y = 100.0f;
     player.sprite.setPosition(sf::Vector2f(640.0f, -100.0f));
@@ -260,15 +259,13 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
       if (penetration_x < penetration_y) {
         if (overlap_left < overlap_right) {
           player.position.x -= penetration_x;
-          // player.velocity.x = player.velocity.x < 0 ? 0.f :
-          // player.velocity.x;
+          player.velocity.x = player.velocity.x < 0 ? 0.f : player.velocity.x;
         } else {
           player.position.x += penetration_x;
-          // player.velocity.x = player.velocity.x > 0 ? 0.f :
-          // player.velocity.x;
+          player.velocity.x = player.velocity.x > 0 ? 0.f : player.velocity.x;
         }
 
-        player.velocity.x = 0.f;
+        // player.velocity.x = 0.f;
       } else {
         if (overlap_top < overlap_bottom) {
           player.position.y -= penetration_y;
@@ -340,6 +337,7 @@ void Stage::apply_stage_snapshot(const StageSnapshot &snapshot,
     bool old_projectile = false;
     for (auto &projectile : projectiles) {
       if (projectile && projectile->id == projectile_snapshot.projectile_id) {
+        projectile->sprite.setScale({2.f, 2.f});
         projectile->add_snapshot(projectile_snapshot, timestamp);
         old_projectile = true;
       }
@@ -359,13 +357,14 @@ void Stage::apply_stage_snapshot(const StageSnapshot &snapshot,
 }
 void Stage::add_projectile_from_snapshot(const ProjectileSnapshot &snapshot) {
   sf::Texture &projectile_texture =
-      resource_manager.getTexture("pocisk_w_orka");
+      resource_manager.getTexture("projectile_tex");
   const float damage = Config::PROJECTILE_DAMAGE;
   float dir_x = snapshot.velocity.x > 0 ? 1.f : -1.f;
   const float lifes = 1;
   auto new_projectile = std::make_unique<Projectile>(
       snapshot.projectile_id, snapshot.owner_id, projectile_texture, dir_x,
       snapshot.position);
+  new_projectile->sprite.setScale({2.f, 2.f});
   projectiles.push_back(std::move(new_projectile));
 }
 void Stage::remove_player(int player_id) { players.erase(player_id); }

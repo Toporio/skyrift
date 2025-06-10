@@ -32,7 +32,7 @@ bool Client::connect(const sf::IpAddress &server_ip,
   server_port = server_port_;
   player_name = player_name_;
   sf::Packet request_packet;
-  request_packet << "JEBAC DISA";
+  request_packet << "POZDRAWIAM DISA";
 
   if (socket.send(request_packet, server_address, server_port) !=
       sf::Socket::Status::Done) {
@@ -76,6 +76,7 @@ void Client::run() {
       if (pair.first == player_id) {
         pair.second->handle_input(input_state, delta_time.asSeconds());
         pair.second->update(delta_time.asSeconds());
+        stage.check_player_map_collision(*pair.second, delta_time.asSeconds());
       }
     }
 

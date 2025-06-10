@@ -36,6 +36,7 @@ public:
   int get_new_projectile_id();
   StageSnapshot get_stage_snapshot() const;
   void update_interpolation(sf::Time timestamp, int client_id);
+  void check_player_map_collision(Player &player, float delta_time);
   void add_projectile_from_snapshot(const ProjectileSnapshot &snapshot);
   void apply_stage_snapshot(const StageSnapshot &snapshot, sf::Time timestamp,
                             int player_id);
@@ -48,7 +49,6 @@ public:
 private:
   int new_player_id;
   sf::Texture background_tex;
-  void check_player_map_collision(Player &player, float delta_time);
   void check_projectile_map_collision();
   void check_player_projectile_collision();
   void check_player_attack_collision();
