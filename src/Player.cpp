@@ -157,8 +157,10 @@ void Player::update(float delta_time) {
       set_animation(6, 0, 32, 32, 32, 0.6f, true);
     } else if (status == PlayerStatus::IDLE) {
       set_animation(4, 0, 162, 32, 30, 0.5f, true);
-    } else {
+    } else if (status == PlayerStatus::FALLING) {
+      apply_gravity(delta_time);
       // TODO: animacje skakania i spadania
+    } else {
     }
   }
     if (previous_status != status)
