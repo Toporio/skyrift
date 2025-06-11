@@ -69,8 +69,9 @@ void Client::run() {
   const sf::Time INTERPOLATION_DELAY = sf::milliseconds(50);
   clock.restart();
   socket.setBlocking(false);
+  sf::Clock delta_cloc;
   while (window.isOpen()) {
-    sf::Time delta_time = clock.restart();
+    sf::Time delta_time = delta_cloc.restart();
     get_input();
     for (auto &pair : stage.get_players()) {
       if (pair.first == player_id) {
