@@ -66,7 +66,7 @@ void Client::run() {
   } else {
     std::cout << " connected to a server" << std::endl;
   }
-  const sf::Time INTERPOLATION_DELAY = sf::milliseconds(50);
+  const sf::Time INTERPOLATION_DELAY = sf::milliseconds(100);
   clock.restart();
   socket.setBlocking(false);
   sf::Clock delta_cloc;
@@ -79,6 +79,10 @@ void Client::run() {
         pair.second->update(delta_time.asSeconds());
         stage.check_player_map_collision(*pair.second, delta_time.asSeconds());
       }
+    }
+    for (auto &projectile : stage.get_projectiles()) {
+      if (projectile->owner_id == player_id)
+        projectile->update(delta_time.asSeconds());
     }
 
     // stage.handle_player_input(player_id, input_state,
@@ -95,6 +99,7 @@ void Client::run() {
         pair.second->update_animation(delta_time.asSeconds());
       }
     }
+
     stage.render(window);
   }
 }

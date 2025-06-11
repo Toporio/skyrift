@@ -66,8 +66,9 @@ void Projectile::update_interpolation(sf::Time timestamp) {
   sf::Vector2f interpolated_position =
       lerp(from->data.position, to->data.position, factor);
   position = interpolated_position;
+  sprite.setPosition(interpolated_position);
   velocity = to->data.velocity;
-  std::cout << "uzyto interpolacji" << std::endl;
+  std::cout << "uzyto interpolacji projectile" << std::endl;
 }
 void Projectile::draw(sf::RenderWindow &window) const { window.draw(sprite); }
 
