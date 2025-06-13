@@ -54,6 +54,7 @@ public:
 
   // player movement
   // direction: -1 left, 1 right, 0 none
+
   void move(float direction);
   void jump();
   void apply_gravity(float delta_time);

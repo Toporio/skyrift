@@ -257,6 +257,7 @@ void Stage::check_player_map_collision(Player &player, float delta_time) {
       float penetration_y =
           (overlap_top < overlap_bottom) ? overlap_top : overlap_bottom;
       if (penetration_x < penetration_y) {
+        player.is_grounded = true;
         if (overlap_left < overlap_right) {
           player.position.x -= penetration_x;
           player.velocity.x = player.velocity.x < 0 ? 0.f : player.velocity.x;

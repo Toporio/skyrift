@@ -294,7 +294,6 @@ void Player::update_interpolation(sf::Time timestamp) {
   health = to->data.health;
   dir_x = to->data.dir_x;
   status = to->data.status;
-  std::cout << "uzyto interpolacji" << std::endl;
 }
 void Player::draw(sf::RenderWindow &window) const {
   sf::Sprite sprite_to_draw = sprite;

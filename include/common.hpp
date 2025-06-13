@@ -1,8 +1,8 @@
 #pragma once
-
 #include "common.hpp"
 #include <SFML/Network.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cstdint>
 #include <string>
 #include <sys/_types/_u_int16_t.h>
 #include <sys/_types/_u_int32_t.h>
@@ -90,16 +90,16 @@ inline sf::Packet &operator<<(sf::Packet &packet,
 }
 inline sf::Packet &operator>>(sf::Packet &packet, StageSnapshot &snapshot) {
   packet >> snapshot.game_tick;
-  u_int8_t player_count;
-  u_int16_t projectile_count;
+  uint8_t player_count;
+  uint16_t projectile_count;
   packet >> player_count;
   packet >> projectile_count;
   snapshot.players.resize(player_count);
   snapshot.projectiles.resize(projectile_count);
-  for (u_int8_t i = 0; i < player_count; ++i) {
+  for (uint8_t i = 0; i < player_count; ++i) {
     packet >> snapshot.players[i];
   }
-  for (u_int16_t i = 0; i < projectile_count; ++i) {
+  for (uint16_t i = 0; i < projectile_count; ++i) {
     packet >> snapshot.projectiles[i];
   }
   return packet;
