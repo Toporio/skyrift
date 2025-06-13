@@ -4,6 +4,7 @@
 #include "common.hpp"
 #include "config.hpp"
 #include <SFML/Graphics.hpp>
+#include <deque>
 #include <memory.h>
 
 class Projectile;
