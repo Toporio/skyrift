@@ -34,12 +34,12 @@ inline sf::Packet &operator<<(sf::Packet &packet,
                               const PlayerSnapshot &snapshot) {
   return packet << snapshot.player_id << snapshot.position.x
                 << snapshot.position.y << snapshot.velocity.x
-                << snapshot.velocity.y << static_cast<u_int8_t>(snapshot.status)
+                << snapshot.velocity.y << static_cast<uint8_t>(snapshot.status)
                 << snapshot.dir_x << snapshot.is_grounded << snapshot.lives
                 << snapshot.health;
 }
 inline sf::Packet &operator>>(sf::Packet &packet, PlayerSnapshot &snapshot) {
-  u_int8_t status;
+  uint8_t status;
   packet >> snapshot.player_id >> snapshot.position.x >> snapshot.position.y >>
       snapshot.velocity.x >> snapshot.velocity.y >> status >> snapshot.dir_x >>
       snapshot.is_grounded >> snapshot.lives >> snapshot.health;
@@ -75,8 +75,8 @@ struct StageSnapshot {
 inline sf::Packet &operator<<(sf::Packet &packet,
                               const StageSnapshot &snapshot) {
   packet << snapshot.game_tick;
-  packet << static_cast<u_int8_t>(snapshot.players.size());
-  packet << static_cast<u_int16_t>(snapshot.projectiles.size());
+  packet << static_cast<uint8_t>(snapshot.players.size());
+  packet << static_cast<uint16_t>(snapshot.projectiles.size());
   for (auto &player_snapshot : snapshot.players) {
     packet << player_snapshot;
   }
