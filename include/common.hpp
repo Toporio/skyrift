@@ -3,6 +3,7 @@
 #include <SFML/Network.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
+#include <deque>
 #include <string>
 #include <vector>
 

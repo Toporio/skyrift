@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "config.hpp"
 #include <SFML/Graphics.hpp>
+#include <deque>
 struct TimedProjectileSnapshot {
   sf::Time timestamp;
   ProjectileSnapshot data;
