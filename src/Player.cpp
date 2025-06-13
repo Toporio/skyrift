@@ -7,8 +7,8 @@
 #include <iostream>
 #include <memory>
 
-sf::Vector2f lerp(const sf::Vector2f &start, const sf::Vector2f &end,
-                  float factor) {
+inline sf::Vector2f lerp(const sf::Vector2f &start, const sf::Vector2f &end,
+                         float factor) {
   return start + (end - start) * factor;
 }
 Player::Player(int id, const sf::Texture &texture, const sf::Vector2f &position,
