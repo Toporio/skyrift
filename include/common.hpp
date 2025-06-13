@@ -4,9 +4,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 #include <string>
-#include <sys/_types/_u_int16_t.h>
-#include <sys/_types/_u_int32_t.h>
-#include <sys/_types/_u_int8_t.h>
 #include <vector>
 
 const unsigned int MAX_PLAYERS = 4;
